@@ -44,16 +44,14 @@ def login():
         email = request.form.get('email')
         access_token = request.form.get('access_token')
 
-
+        # Fetch the user from the database
         user = Student.query.filter_by(student_email=email).first()
 
         if user and check_password_hash(user.student_access_token, access_token):
             login_user(user)
-
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('main.userdashboard'))
+            return redirect(url_for('main.userdashboard'))
         else:
-            flash('Invalid email or access token.')
+            flash('Invalid email or password. Please try again.', 'danger')  # Flash error message
 
     return render_template('login.html')
 
