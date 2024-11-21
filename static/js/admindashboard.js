@@ -163,10 +163,54 @@ function deleteQuestion(questionId) {
 }
 
 function editQuestion(question) {
-    // Placeholder for edit functionality
-    console.log('Edit question:', question);
-    showToast('Info', 'Edit functionality coming soon', 'info');
+    console.log('Editing question:', question);
+
+    // Populate the modal with the existing question data
+    const feedbackModal = document.getElementById('feedbackModal');
+    const modalTitle = feedbackModal.querySelector('.modal-title');
+    const submitBtn = feedbackModal.querySelector('#submitQuestion');
+
+    // Assuming you have input fields for these values in the modal
+    document.getElementById('questionText').value = question.question_text;
+    document.getElementById('questionType').value = question.question_type;
+    document.getElementById('activeStartDate').value = question.active_start_date;
+    document.getElementById('activeEndDate').value = question.active_end_date;
+
+    modalTitle.innerHTML = '<i class="fas fa-edit me-2"></i>Edit Feedback Question';
+    submitBtn.id = 'editQuestion'; // Change button ID to indicate edit action
+    submitBtn.textContent = 'Update';
+
+    // Show the modal
+    new bootstrap.Modal(feedbackModal).show();
+
+    // Handle form submission for editing
+    submitBtn.addEventListener('click', () => {
+        const formData = new FormData(document.getElementById('feedbackForm'));
+        formData.append('id', question.id); // Append the question id for the edit operation
+
+        const url = '/admin/feedback-question/update'; // Endpoint for updating a question
+
+        fetch(url, {
+            method: 'PUT',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showToast('Success', 'Question updated successfully', 'success');
+                bootstrap.Modal.getInstance(feedbackModal).hide(); // Hide modal after successful update
+                updateFeedbackQuestions(data.questions); // Update the list of questions
+            } else {
+                showToast('Error', data.message || 'Update failed', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error', 'Update failed', 'error');
+        });
+    });
 }
+
 
 function setupEventListeners() {
     const submitQuestionBtn = document.getElementById('submitQuestion');
