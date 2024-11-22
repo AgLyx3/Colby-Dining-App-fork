@@ -18,12 +18,14 @@
 
     <!-- Icon Font Stylesheet -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" >
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Libraries Stylesheet -->
     <link href="../static/lib/animate/animate.min.css" rel="stylesheet">
     <link href="../static/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="../static/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+    
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="../static/css/bootstrap.min.css" rel="stylesheet">
@@ -56,7 +58,7 @@
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <div class="navbar-nav ms-auto py-0 pe-4">
                         <a href="{{ url_for('main.index') }}" class="nav-item nav-link active">Home</a>    
-                        <a href="{{ url_for('main.menu') }}" class="nav-item nav-link">Menu</a>
+                        <a href="{{ url_for('main.menu_page') }}" class="nav-item nav-link">Menu</a>
                         <a href="{{ url_for('main.contact') }}" class="nav-item nav-link">Contact</a>
                     </div>
                     {% if current_user.is_authenticated %}
@@ -82,7 +84,7 @@
                             <p class="text-white animated slideInLeft mb-4 pb-2">Check real-time dining hall wait times, browse menus with dietary filters, save your favorite dishes, 
                                 and receive notifications when they're available. Help us improve by participating in our feedback system - 
                                 every response helps make dining better for everyone!</p>
-                            <a href="" class="btn btn-primary py-sm-3 px-sm-5 me-3 animated slideInLeft">Explore All Dining Halls</a>
+                            <a href="{{ url_for('main.menu_page') }}" class="btn btn-primary py-sm-3 px-sm-5 me-3 animated slideInLeft">Explore All Dining Halls</a>
                         </div>
                         <div class="col-lg-6 text-center text-lg-end overflow-hidden">
                             <img class="img-fluid" src="../static/img/hero.png" alt="">

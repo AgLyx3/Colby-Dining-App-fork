@@ -57,7 +57,7 @@
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <div class="navbar-nav ms-auto py-0 pe-4">
                         <a href="{{ url_for('main.index') }}" class="nav-item nav-link">Home</a>    
-                        <a href="{{ url_for('main.menu') }}" class="nav-item nav-link active">Menu</a>
+                        <a href="{{ url_for('main.menu_page') }}" class="nav-item nav-link active">Menu</a>
                         <a href="{{ url_for('main.contact') }}" class="nav-item nav-link">Contact</a>
                     </div>
                     {% if current_user.is_authenticated %}
@@ -91,95 +91,100 @@
 
 
         <!-- Menu Start -->
-    <div class="container-xxl py-5">
-        <div class="container">
-            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-                <h5 class="section-title ff-secondary text-center text-primary fw-normal">Food Menu</h5>
-                <h1 class="mb-5">Colby Dining Service</h1>
-            </div>
-            <div class="tab-class text-center wow fadeInUp" data-wow-delay="0.1s">
-                <div class="filter-section mb-5">
-                    <form id="menu-search-form" action="{{ url_for('main.menu') }}" method="get">
-                        <div class="selection-row mb-4">
-                            <p class="selection-label">Dining Hall</p>
-                            <ul class="nav nav-pills d-inline-flex justify-content-center">
-                                {% for tag in all_tags %}
-                                    {% if tag.type == 'Location' %}
-                                        <li class="filter-item">
-                                            <input type="checkbox" id="{{ tag.name|lower }}" name="tags" value="{{ tag.name }}" {% if tag.name in selected_tags %}checked{% endif %}>
-                                            <label for="{{ tag.name|lower }}" class="filter-link">{{ tag.name }}</label>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        
-                        <div class="selection-row mb-4">
-                            <p class="selection-label">Meal</p>
-                            <ul class="nav nav-pills d-inline-flex justify-content-center">
-                                {% for tag in all_tags %}
-                                    {% if tag.type == 'Meal' %}
-                                        <li class="filter-item">
-                                            <input type="checkbox" id="{{ tag.name|lower }}" name="tags" value="{{ tag.name }}" {% if tag.name in selected_tags %}checked{% endif %}>
-                                            <label for="{{ tag.name|lower }}" class="filter-link">{{ tag.name }}</label>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        
-                        <div class="selection-row mb-4">
-                            <p class="selection-label">Food Type</p>
-                            <ul class="nav nav-pills d-inline-flex justify-content-center">
-                                {% for tag in all_tags %}
-                                    {% if tag.type == 'FoodType' %}
-                                        <li class="filter-item">
-                                            <input type="checkbox" id="{{ tag.name|lower }}" name="tags" value="{{ tag.name }}" {% if tag.name in selected_tags %}checked{% endif %}>
-                                            <label for="{{ tag.name|lower }}" class="filter-link">{{ tag.name }}</label>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">Search</button>
-                    </form>
-                </div>
 
-                <!-- Tab Content for displaying food items -->
-                <div class="row row-cols-1 row-cols-md-2 g-4">
-                    {% if foods %}
-                    {% for food in foods %}
-                    <div class="col">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ food.name }}</h5>
-                                <p class="card-text fst-italic">{{ food.description }}</p>
-                                <p class="card-text"><strong>Calories:</strong> {{ food.calories }}</p>
-                                <p class="card-text">
-                                    <strong>Tags:</strong>
-                                    {% for tag in food.tags %}
-                                    <span class="badge bg-secondary">{{ tag }}</span>
-                                    {% endfor %}
-                                </p>
-                            </div>
+        <!-- Menu Filter Section -->
+        <div class="container-xxl py-5">
+            <div class="container">
+                <h1 class="text-center mb-5">Dining Menu</h1>
+        
+                <!-- Filters Section -->
+                <div class="filters-section mb-4">
+                    <!-- Dining Hall Selection -->
+                    <div class="filter-group">
+                        <h3>Select Dining Hall</h3>
+                        <div class="dining-halls">
+                            <button class="hall-btn active" data-hall="Dana">Dana</button>
+                            <button class="hall-btn" data-hall="Roberts">Roberts</button>
+                            <button class="hall-btn" data-hall="Foss">Foss</button>
                         </div>
                     </div>
-                    {% endfor %}
-                    {% else %}
-                    <div class="col">
-                        <div class="card">
-                            <div class="card-body">
-                                <p>No foods match your filters. Please try different selections.</p>
-                            </div>
+        
+                    <!-- Date Selection -->
+                    <div class="filter-group">
+                        <h3>Select Date</h3>
+                        <input type="date" id="date-picker" 
+                               value="{{ today_date }}"
+                               min="{{ today_date }}"
+                               max="{{ max_date }}"
+                               class="form-control">
+                    </div>
+        
+                    <!-- Meal Period Filter -->
+                    <div class="filter-group">
+                        <h3>Meal Period</h3>
+                        <div class="meal-periods">
+                            <button class="period-btn active" data-period="all">All</button>
+                            <button class="period-btn" data-period="Breakfast">Breakfast</button>
+                            <button class="period-btn" data-period="Lunch">Lunch</button>
+                            <button class="period-btn" data-period="Dinner">Dinner</button>
                         </div>
                     </div>
-                    {% endif %}
+
+                    <!-- Search Bar -->
+                    <div class="filter-group">
+                        <h3>Search Menu</h3>
+                        <div class="search-container">
+                            <input 
+                                type="text" 
+                                id="menu-search" 
+                                placeholder="Search for dishes, ingredients, or stations..."
+                                aria-label="Search menu items">
+                            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
+                    </div>
+        
+                    <!-- Dietary Filters -->
+                    <div class="filter-group">
+                        <h3>Dietary Preferences</h3>
+                        <div class="dietary-filters">
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="Vegetarian" class="dietary-filter">
+                                Vegetarian
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="Vegan" class="dietary-filter">
+                                Vegan
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="Gluten-Free" class="dietary-filter">
+                                Gluten Free
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="Halal" class="dietary-filter">
+                                Halal
+                            </label>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Loading Spinner -->
+                <div id="loading-spinner" class="text-center py-4 hidden">
+                    <div class="spinner"></div>
+                </div>
+        
+                <!-- Error Message -->
+                <div id="error-message" class="alert alert-danger text-center hidden" role="alert"></div>
+        
+                <!-- Menu Content -->
+                <div id="menu-container" class="menu-container">
+                    <!-- Menu items will be inserted here via JavaScript -->
                 </div>
             </div>
         </div>
-    </div>
-    <!-- Menu End -->
+
 
        <!-- Footer Start -->
        <div class="container-fluid bg-dark text-light footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">
@@ -277,9 +282,17 @@
     <script src="../static/lib/tempusdominus/js/moment.min.js"></script>
     <script src="../static/lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="../static/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash/4.17.21/lodash.min.js"></script>
+   
     <!-- Template Javascript -->
     <script src="../static/js/main.js"></script>
+    <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Document loaded');
+            new MenuManager();
+        });
+    </script>
 </body>
 
 </html>

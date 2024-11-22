@@ -1,26 +1,29 @@
 
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for
 from flask import Blueprint, render_template, redirect, url_for
-from flask import request
+from flask import request, current_app
 from models import db, Food, Tag, food_tags
 from flask_login import login_required, current_user
 from utils import filter_foods, get_all_foods
 from flask import Blueprint, render_template, jsonify
 from flask import Blueprint, render_template, jsonify, request, redirect, session, url_for
 from flask_login import current_user, login_required
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import logging
 from auth import admin_required
 from dining_predictor import DiningHallPredictor
 from models import db, FeedbackQuestion, Administrator, Response
 from email_utils import EmailSender
+from typing import Dict, List, Optional
+from menu_api import BonAppetitAPI
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 main_blueprint = Blueprint('main', __name__)
+menu_bp = Blueprint('menu', __name__)
 
 email_sender = EmailSender()
 
@@ -315,6 +318,177 @@ def submit_feedback():
         return jsonify({
             'success': False,
             'message': 'An unexpected error occurred. Please try again later.'
+        }), 500
+
+
+@main_blueprint.route('/menu')
+def menu_page():  
+    today = datetime.now()
+    return render_template('menu.html', 
+        locations=["Dana", "Roberts", "Foss"],
+        dietary_filters=[
+            {"id": "vegetarian", "label": "Vegetarian", "value": "vegetarian"},
+            {"id": "vegan", "label": "Vegan", "value": "vegan"},
+            {"id": "gluten-free", "label": "Gluten Free", "value": "gluten-free"},
+            {"id": "halal", "label": "Halal", "value": "halal"},
+        ],
+        today_date=today.strftime('%Y-%m-%d'),
+        min_date=today.strftime('%Y-%m-%d'),
+        max_date=(today + timedelta(days=7)).strftime('%Y-%m-%d')
+    )
+
+
+@menu_bp.route('/api/menu/current', methods=['GET'])
+def get_current_menus():
+    try:
+        # Get menu service instance 
+        menu_service = BonAppetitAPI(
+            username=current_app.config['MENU_API_USERNAME'],
+            password=current_app.config['MENU_API_PASSWORD']
+        )
+
+        date = datetime.now().strftime('%Y-%m-%d')
+        menus = menu_service.get_all_dining_hall_menus(date)
+
+        return jsonify({
+            'status': 'success',
+            'date': date,
+            'menus': menus
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+    
+@menu_bp.route('/<dining_hall>')
+def get_dining_hall_menu(dining_hall):
+    try:
+        menu_service = BonAppetitAPI(
+            username=current_app.config['MENU_API_USERNAME'],
+            password=current_app.config['MENU_API_PASSWORD']
+        )
+        
+        date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
+        logger.info(f"Fetching menu for {dining_hall} on {date}")
+        
+        # Get correct cafe ID
+        cafe_id = menu_service.DINING_HALLS.get(dining_hall)
+        if not cafe_id:
+            return jsonify({'status': 'error', 'message': 'Invalid dining hall'}), 400
+            
+        menu_data = menu_service.get_menu(cafe_id, date)
+        if menu_data:
+            processed_menu = menu_service.process_menu_data(menu_data)
+            return jsonify({
+                'status': 'success',
+                'menu': processed_menu
+            })
+        
+        return jsonify({
+            'status': 'error', 
+            'message': 'No menu data available'
+        }), 404
+        
+    except Exception as e:
+        logger.error(f"Error fetching menu: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+@menu_bp.route('/api/menu/weekly/<dining_hall>', methods=['GET'])
+def get_weekly_menu(dining_hall: str):
+    """Get weekly menu for a specific dining hall"""
+    try:
+        # Validate dining hall
+        dining_hall = dining_hall.title()
+        if dining_hall not in current_app.menu_service.DINING_HALLS:
+            return jsonify({
+                'status': 'error',
+                'message': 'Invalid dining hall'
+            }), 400
+            
+        # Calculate date range
+        today = datetime.now().date()
+        dates = [(today + timedelta(days=i)).strftime('%Y-%m-%d') 
+                for i in range(7)]
+                
+        weekly_menu = {}
+        cafe_id = current_app.menu_service.DINING_HALLS[dining_hall]
+        
+        for date in dates:
+            # Try cache first
+            cached_menu = current_app.menu_cache.get_cached_menu(date, dining_hall)
+            if cached_menu:
+                weekly_menu[date] = cached_menu
+                continue
+                
+            # Fetch fresh data if needed
+            menu_data = current_app.menu_service.get_menu(cafe_id, date)
+            if menu_data:
+                processed_menu = current_app.menu_service.process_menu_data(menu_data)
+                weekly_menu[date] = processed_menu
+                current_app.menu_cache.save_menu_to_cache(date, dining_hall, processed_menu)
+            else:
+                weekly_menu[date] = []
+                
+        return jsonify({
+            'status': 'success',
+            'dining_hall': dining_hall,
+            'weekly_menu': weekly_menu
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching weekly menu for {dining_hall}: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': 'Unable to fetch weekly menu'
+        }), 500
+
+@menu_bp.route('/api/menu/hours', methods=['GET'])
+def get_dining_hours():
+    """Get current operating hours for all dining halls"""
+    try:
+        menu_service = current_app.menu_service
+        all_hours = {}
+        
+        for hall_name, hall_id in menu_service.DINING_HALLS.items():
+            cafe_info = menu_service.get_cafe_info(hall_id)
+            if cafe_info and 'cafes' in cafe_info:
+                cafe_data = cafe_info['cafes'].get(hall_id, {})
+                
+                # Extract hours from dayparts
+                today = datetime.now().date()
+                today_str = today.strftime('%Y-%m-%d')
+                
+                hours = []
+                for day in cafe_data.get('days', []):
+                    if day.get('date') == today_str:
+                        for daypart in day.get('dayparts', []):
+                            hours.append({
+                                'meal': daypart.get('label', ''),
+                                'start_time': daypart.get('starttime', ''),
+                                'end_time': daypart.get('endtime', ''),
+                                'message': daypart.get('message', '')
+                            })
+                
+                all_hours[hall_name] = {
+                    'status': day.get('status', 'unknown'),
+                    'message': day.get('message', ''),
+                    'hours': hours
+                }
+            
+        return jsonify({
+            'status': 'success',
+            'hours': all_hours
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching dining hours: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': 'Unable to fetch dining hours'
         }), 500
 
 

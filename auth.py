@@ -10,10 +10,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Force allow HTTP for development
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-# Initialize LoginManager
+
 login_manager = LoginManager()
 login_manager.login_view = 'auth.google_login'
 login_manager.login_message = 'Please log in with your Colby email to access this page.'
@@ -30,8 +29,6 @@ google_bp = make_google_blueprint(
         "https://www.googleapis.com/auth/userinfo.email",
         "https://www.googleapis.com/auth/userinfo.profile",
     ],
-    # redirect_url="/login/google/authorized",  
-    # reprompt_consent=True,
     storage=SessionStorage()
     
 )

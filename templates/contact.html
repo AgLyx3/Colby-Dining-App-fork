@@ -56,7 +56,7 @@
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <div class="navbar-nav ms-auto py-0 pe-4">
                         <a href="{{ url_for('main.index') }}" class="nav-item nav-link">Home</a>    
-                        <a href="{{ url_for('main.menu') }}" class="nav-item nav-link">Menu</a>
+                        <a href="{{ url_for('main.menu_page') }}" class="nav-item nav-link">Menu</a>
                         <a href="{{ url_for('main.contact') }}" class="nav-item nav-link active">Contact</a>
                     </div>
                     {% if current_user.is_authenticated %}
