@@ -186,39 +186,6 @@ function editQuestion(question) {
     feedbackModal.show();
 }
 
-
-function updateQuestion(questionId, form) {
-    const formData = new FormData(form);
-
-    // Disable submit button to prevent multiple clicks
-    const submitButton = document.getElementById('submitQuestion');
-    submitButton.disabled = true;
-
-    fetch(`/admin/feedback-question/${questionId}`, {
-        method: 'PUT', // Using PUT for update
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            showToast('Success', 'Question updated successfully', 'success');
-            bootstrap.Modal.getInstance(document.getElementById('feedbackModal')).hide();
-            initializeDashboard(); // Refresh the questions list
-        } else {
-            showToast('Error', data.message || 'Failed to update question', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Error', 'Failed to update question', 'error');
-    })
-    .finally(() => {
-        submitButton.disabled = false;
-    });
-}
-
-
-
 function setupEventListeners() {
     const submitQuestionBtn = document.getElementById('submitQuestion');
     const feedbackModal = document.getElementById('feedbackModal');
