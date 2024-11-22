@@ -259,6 +259,8 @@ function setupEventListeners() {
     });
 }
 
+let chartInstance;
+
 function loadResponses(questionId, questionType) {
     console.log('loadResponses function triggered');
 
@@ -301,13 +303,24 @@ function loadResponses(questionId, questionType) {
                 responseChart.style.display = 'block';
 
                 const chartData = processChartData(data.responses, questionType);
+                console.log('Chart data:', chartData); // Debugging response data
+
+                // Destroy previous chart if exists
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
 
                 // Create the Pie Chart using Chart.js
                 const ctx = responseChart.getContext('2d');
-                new Chart(ctx, {
-                    type: 'pie',
-                    data: chartData,
-                });
+                if (ctx) {
+                    console.log('Chart context retrieved:', ctx);  // Ensure canvas context is retrieved
+                    chartInstance = new Chart(ctx, {
+                        type: 'pie',
+                        data: chartData,
+                    });
+                } else {
+                    console.error('Failed to retrieve canvas context.');
+                }
             } else if (questionType === 'text') {
                 // Handle Text question type and display as a list
                 responseList.style.display = 'block';
@@ -333,7 +346,6 @@ function loadResponses(questionId, questionType) {
     });
 }
 
-
 function processChartData(responses, questionType) {
     let chartData = {
         labels: [],
@@ -343,6 +355,8 @@ function processChartData(responses, questionType) {
             hoverBackgroundColor: ['#ff6666', '#3399ff', '#66ff66', '#ff9933', '#9999ff']
         }]
     };
+
+    console.log('Processing chart data for:', questionType); // Debugging chart processing
 
     if (questionType === 'yes-no') {
         chartData.labels = ['Yes', 'No'];
@@ -363,6 +377,7 @@ function processChartData(responses, questionType) {
 
     return chartData;
 }
+
 
 
 function showToast(title, message, type = 'info') {
