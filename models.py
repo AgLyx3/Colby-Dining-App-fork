@@ -78,6 +78,7 @@ class Administrator(db.Model, UserMixin):
 
 class FeedbackQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    #activated = db.Column(db.Boolean, nullable=False, default=False)
     question_text = db.Column(db.Text, nullable=False)
     question_type = db.Column(db.String(50), nullable=False)
     active_start_date = db.Column(db.Date, nullable=False)

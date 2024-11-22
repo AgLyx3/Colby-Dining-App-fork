@@ -107,11 +107,6 @@ function updateFeedbackQuestions(questions) {
         const actionButtons = document.createElement('div');
         actionButtons.classList.add('btn-group', 'btn-group-sm');
 
-        const editButton = document.createElement('button');
-        editButton.classList.add('btn', 'btn-outline-primary');
-        editButton.innerHTML = '<i class="fas fa-edit"></i>';
-        editButton.title = 'Edit Question';
-
         const deleteButton = document.createElement('button');
         deleteButton.classList.add('btn', 'btn-outline-danger');
         deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
@@ -123,7 +118,6 @@ function updateFeedbackQuestions(questions) {
         viewResponsesButton.innerHTML = '<i class="fas fa-chart-pie"></i>';
         viewResponsesButton.title = 'View Responses';
 
-        actionButtons.appendChild(editButton);
         actionButtons.appendChild(deleteButton);
         actionButtons.appendChild(viewResponsesButton)
 
@@ -131,8 +125,6 @@ function updateFeedbackQuestions(questions) {
         questionItem.appendChild(actionButtons);
         feedbackList.appendChild(questionItem);
 
-        // Add event listener for edit
-        editButton.addEventListener('click', () => editQuestion(question));
 
         // Add event listener for view response
         viewResponsesButton.addEventListener('click', () => loadResponses(question.id, question.question_type));
@@ -172,28 +164,6 @@ function deleteQuestion(questionId) {
     });
 }
 
-function editQuestion(question) {
-    const feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
-    const form = document.getElementById('feedbackForm');
-    
-    // Pre-fill form with existing question data
-    form.elements['questionText'].value = question.question_text;
-    form.elements['questionType'].value = question.question_type;
-    form.elements['activeStartDate'].value = new Date(question.active_start_date).toLocaleDateString('en-CA'); // Format as yyyy-mm-dd
-    form.elements['activeEndDate'].value = new Date(question.active_end_date).toLocaleDateString('en-CA'); // Format as yyyy-mm-dd
-
-    // Set the question ID in a hidden field
-    form.elements['questionId'].value = question.id;
-
-    // Change modal title and button text for editing
-    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Feedback Question';
-    const submitButton = document.getElementById('submitQuestion');
-    submitButton.textContent = 'Update Question'; // Change to 'Update' for editing
-    submitButton.onclick = () => updateQuestion(question.id, form);
-
-    // Show the modal
-    feedbackModal.show();
-}
 
 function setupEventListeners() {
     const submitQuestionBtn = document.getElementById('submitQuestion');
@@ -202,7 +172,6 @@ function setupEventListeners() {
     submitQuestionBtn.addEventListener('click', () => {
         const form = document.getElementById('feedbackForm');
         const formData = new FormData(form);
-        const questionId = formData.get('questionId'); // Get the questionId from the form
 
         // Basic form validation
         const questionText = formData.get('questionText');
@@ -215,38 +184,25 @@ function setupEventListeners() {
         }
 
         submitQuestionBtn.disabled = true;
-
-        let method, url;
         
-        if (questionId) {
-            // If questionId exists, update the existing question
-            method = 'PUT';
-            url = `/admin/feedback-question/${questionId}`;
-        } else {
-            // Otherwise, create a new question
-            method = 'POST';
-            url = '/admin/feedback-question';
-        }
-
-        fetch(url, {
-            method: method,
+        fetch('/admin/feedback-question', {
+            method: 'POST',
             body: formData
         })
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                const successMessage = questionId ? 'Question updated successfully' : 'Question added successfully';
-                showToast('Success', successMessage, 'success');
+                showToast('Success', 'Question added successfully', 'success');
                 bootstrap.Modal.getInstance(feedbackModal).hide();
                 initializeDashboard();
                 form.reset();
             } else {
-                showToast('Error', data.message || 'Failed to submit question', 'error');
+                showToast('Error', data.message || 'Failed to add question', 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            showToast('Error', 'Failed to submit question', 'error');
+            showToast('Error', 'Failed to add question', 'error');
         })
         .finally(() => {
             submitQuestionBtn.disabled = false;

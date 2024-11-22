@@ -149,54 +149,7 @@ def delete_feedback_question(question_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 400
-
-@main_blueprint.route('/admin/feedback-question/<int:question_id>', methods=['PUT'])
-@login_required
-@admin_required  
-def edit_feedback_question(question_id):
-    try:
-        # Retrieve the existing question from the database
-        question = FeedbackQuestion.query.get_or_404(question_id)
-
-        # Ensure that the current user is the administrator of this question
-        if question.administrator_id != current_user.admin_email:
-            return jsonify({'status': 'error', 'message': 'Unauthorized to edit this question'}), 403
-
-        # Parse the form data (using request.form)
-        question_text = request.form.get('questionText')
-        question_type = request.form.get('questionType')
-        active_start_date = request.form.get('activeStartDate')
-        active_end_date = request.form.get('activeEndDate')
-
-        # Convert the date strings to datetime objects
-        question.active_start_date = datetime.strptime(active_start_date, '%Y-%m-%d').date()
-        question.active_end_date = datetime.strptime(active_end_date, '%Y-%m-%d').date()
-
-        # Update the question attributes
-        question.question_text = question_text
-        question.question_type = question_type
-
-        # Commit the changes to the database
-        db.session.commit()
-
-        # Return a success response with updated question data (optional)
-        return jsonify({
-            'status': 'success',
-            'message': 'Question updated successfully',
-            'questions': [{
-                'id': question.id,
-                'question_text': question.question_text,
-                'question_type': question.question_type,
-                'active_start_date': question.active_start_date.isoformat(),
-                'active_end_date': question.active_end_date.isoformat(),
-                'created_at': question.created_at.isoformat() if question.created_at else None
-            }]
-        })
-    except Exception as e:
-        # Rollback any database changes if there's an error
-        db.session.rollback()
-        return jsonify({'status': 'error', 'message': str(e)}), 400
-
+    
 @main_blueprint.route('/api/admin/feedback-questions', methods=['GET'])
 def get_feedback_questions():
     try:
