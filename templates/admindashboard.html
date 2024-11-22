@@ -182,13 +182,16 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-light">
-                    <h5 class="modal-title">
+                    <h5 class="modal-title" id="modalTitle">
                         <i class="fas fa-plus-circle me-2"></i>New Feedback Question
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="feedbackForm">
+                        <!-- Hidden input for questionId -->
+                        <input type="hidden" name="questionId" id="questionId" value="">
+
                         <div class="mb-3">
                             <label for="questionText" class="form-label">Question Text</label>
                             <textarea class="form-control" name="questionText" id="questionText" rows="3" 
@@ -206,12 +209,12 @@
                         <div class="mb-3">
                             <label for="activeStartDate" class="form-label">Active Start Date</label>
                             <input type="date" class="form-control" name="activeStartDate" 
-                                   id="activeStartDate" required>
+                                id="activeStartDate" required>
                         </div>
                         <div class="mb-3">
                             <label for="activeEndDate" class="form-label">Active End Date</label>
                             <input type="date" class="form-control" name="activeEndDate" 
-                                   id="activeEndDate" required>
+                                id="activeEndDate" required>
                         </div>
                     </form>
                 </div>
@@ -225,6 +228,7 @@
         </div>
     </div>
     <!-- Feedback Modal End-->
+
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-light footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">
