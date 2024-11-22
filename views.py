@@ -13,7 +13,7 @@ import os
 import logging
 from auth import admin_required
 from dining_predictor import DiningHallPredictor
-from models import db, FeedbackQuestion, Administrator
+from models import db, FeedbackQuestion, Administrator, Response
 from email_utils import EmailSender
 
 # Configure logging
@@ -152,7 +152,7 @@ def delete_feedback_question(question_id):
 
 @main_blueprint.route('/admin/feedback-question/<int:question_id>', methods=['PUT'])
 @login_required
-@admin_required  # Assuming this is a decorator to ensure only admin can access this
+@admin_required  
 def edit_feedback_question(question_id):
     try:
         # Retrieve the existing question from the database
@@ -214,6 +214,52 @@ def get_feedback_questions():
         })
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@main_blueprint.route('/admin/feedback-question/get-response/<int:question_id>', methods=['GET'])
+@login_required
+@admin_required
+def get_responses(question_id):
+    question_type = request.args.get('question_type')
+    
+    # Fetch the question and responses from the database
+    feedback_question = FeedbackQuestion.query.get(question_id)
+    
+    if not feedback_question:
+        return jsonify({'error': 'Question not found'}), 404
+
+    # Check if the question type matches the one in the query parameters
+    if feedback_question.question_type != question_type:
+        return jsonify({'error': 'Mismatched question type'}), 400
+
+    # Get the responses
+    responses = Response.query.filter_by(question_id=question_id).all()
+    
+    # Prepare the responses data based on the question type
+    response_data = {'question': feedback_question.question_text, 'responses': {}}
+    
+    if question_type == 'yes-no':
+        yes_count = 0
+        no_count = 0
+        for response in responses:
+            if response.content.lower() == 'yes':
+                yes_count += 1
+            elif response.content.lower() == 'no':
+                no_count += 1
+        response_data['responses'] = {'yes': yes_count, 'no': no_count}
+    
+    elif question_type == 'rating':
+        rating_counts = {str(i): 0 for i in range(1, 6)}  # Ratings 1 to 5
+        for response in responses:
+            if response.content in rating_counts:
+                rating_counts[response.content] += 1
+        response_data['responses'] = rating_counts
+    
+    elif question_type == 'text':
+        text_responses = [response.content for response in responses]
+        response_data['responses'] = text_responses
+    
+    # Return the responses as JSON
+    return jsonify(response_data)
 
 # Wait times API
 @main_blueprint.route('/api/wait-times')
