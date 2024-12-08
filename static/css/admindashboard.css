@@ -250,3 +250,38 @@ body {
     0% { opacity: 0; transform: translateY(10px); }
     100% { opacity: 1; transform: translateY(0); }
 }
+/* Survey link styles */
+.survey-link-item {
+    position: relative;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.survey-link-item:hover {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.survey-link-item .title {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.survey-link-item .url {
+    font-size: 0.9rem;
+    color: var(--primary);
+    word-break: break-all;
+}
+
+.survey-link-item .dates {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+}
+
+.btn-group > .btn-sm {
+    padding: 0.25rem 0.75rem;
+}

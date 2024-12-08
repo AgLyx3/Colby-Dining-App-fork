@@ -315,3 +315,32 @@ document.querySelectorAll('.wait-time-card').forEach(card => {
         this.style.transform = 'translateY(0)';
     });
 });
+
+// Add this to userdashboard.js
+document.addEventListener('DOMContentLoaded', function() {
+    // Find the feedback button
+    const feedbackBtn = document.querySelector('[data-feedback-btn]');
+    
+    if (feedbackBtn) {
+        // Fetch active survey link when page loads
+        fetch('/api/active-survey')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Update the button's href with the survey URL
+                    feedbackBtn.href = data.survey.url;
+                    feedbackBtn.target = "_blank"; // Open in new tab
+                    feedbackBtn.setAttribute('title', data.survey.title);
+                } else {
+                    // If no active survey, disable the button and show message
+                    feedbackBtn.classList.add('disabled');
+                    feedbackBtn.setAttribute('title', 'No active survey available');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching survey link:', error);
+                feedbackBtn.classList.add('disabled');
+                feedbackBtn.setAttribute('title', 'Error loading survey link');
+            });
+    }
+});

@@ -1,8 +1,9 @@
-from app import app, db
+from app import create_app, db
 from models import Administrator
 import traceback
 
 def update_database():
+    app = create_app()
     with app.app_context():
         try:
             # Drop and recreate the Administrator table

@@ -14,7 +14,7 @@ class DiningHallPredictor:
     def __init__(self, model_dir='ml_models', data_dir='data'):
         """Initialize predictor with model and data directories"""
         self.dining_halls = ['Dana', 'Roberts', 'Foss']
-        self.sequence_length = 6  # Keep for feature engineering
+        self.sequence_length = 6  
         self.models = {}
         self.scalers = {}
         self.model_dir = model_dir
@@ -210,15 +210,15 @@ class DiningHallPredictor:
             
             # Create feature vector for prediction
             features = pd.DataFrame([{
-                'count': 0,  # Placeholder for scaling
+                'count': 3, 
                 'hour': current_time.hour,
                 'minute': current_time.minute,
                 'day_of_week': current_time.weekday(),
                 'is_weekend': current_time.weekday() >= 5,
                 'time_of_day': current_time.hour + current_time.minute/60,
                 'is_peak_hour': current_time.hour in [8, 12, 18],
-                'rolling_mean': 0,  # Will be scaled
-                'rolling_std': 0  # Will be scaled
+                'rolling_mean': 0,  
+                'rolling_std': 0  
             }])
             
             # Scale features
@@ -227,6 +227,8 @@ class DiningHallPredictor:
             # Make prediction
             predicted_swipes = self.models[location].predict(scaled_features)[0]
             predicted_swipes = int(max(0, predicted_swipes))  # Ensure non-negative
+            predicted_swipes = predicted_swipes * 6
+            print(predicted_swipes)
             
             # Calculate swipes per minute
             swipes_per_minute = predicted_swipes / 15
@@ -236,18 +238,16 @@ class DiningHallPredictor:
                 wait_time = (predicted_swipes * 10) / 60  # 10 seconds per swipe
                 busyness_level = 'High'
             elif swipes_per_minute > 1.33:  # 20-40 swipes per 15 min (medium traffic)
-                wait_time = (predicted_swipes * 7) / 60  # 7 seconds per swipe
+                wait_time = (predicted_swipes * 10) / 60  # 7 seconds per swipe
                 busyness_level = 'Medium'
             else:  # <20 swipes per 15 min (low traffic)
-                wait_time = (predicted_swipes * 5) / 60  # 5 seconds per swipe
+                wait_time = (predicted_swipes * 10) / 60  # 5 seconds per swipe
                 busyness_level = 'Low'
             
             # Add small random variation (±10%) to make predictions more realistic
             variation = np.random.uniform(0.9, 1.1)
             wait_time = round(wait_time * variation, 1)
             
-            # Cap maximum wait at 15 minutes
-            wait_time = min(wait_time, 15)
             
             return {
                 'predicted_count': predicted_swipes,

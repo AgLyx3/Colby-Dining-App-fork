@@ -228,10 +228,13 @@
                         <i class="fas fa-utensils me-2"></i>Browse Menu
                     </a>
                     <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#preferencesModal">
-                        <i class="fas fa-cog me-2"></i>Dining Preferences
+                        <i class="fas fa-cog me-2"></i>Website Preferences
                     </button>
-                    <a href="/contact" class="btn btn-outline-primary">
+                    <a href="#" class="btn btn-outline-primary" data-feedback-btn>
                         <i class="fas fa-comment-alt me-2"></i>Submit Feedback
+                    </a>
+                    <a href="https://colby-sp.transactcampus.com/eaccounts/AnonymousHome.aspx" class="btn btn-outline-primary">
+                        <i class="fas fa-link me-2"></i>Transact
                     </a>
                 </div>
             </div>
@@ -253,9 +256,9 @@
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h5 class="mb-0">Favorite Dishes</h5>
-                    <button class="btn btn-outline-primary btn-sm">
+                    <a href="{{ url_for('main.menu_page') }}" class="btn btn-outline-primary btn-sm">
                         <i class="fas fa-plus me-2"></i>Add More
-                    </button>
+                    </a>
                 </div>
                 <div id="favorites-container" class="row g-3">
                     <!-- Favorites will be populated here -->
@@ -272,7 +275,7 @@
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-0">
                         <div class="modal-header">
-                            <h5 class="modal-title"> Website Preferences</h5>
+                            <h5 class="modal-title">Preferences</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
@@ -292,16 +295,9 @@
                                 </div>
                             </div> -->
                             <div class="mb-3">
-                                <label class="form-label">Notification Preferences</label>
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="emailNotifications">
-                                    <!-- <label class="form-check-label" for="emailNotifications">Email Notifications</label> -->
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="notificationToggle">
-                                        <label class="form-check-label" for="notificationToggle">
-                                            Email notifications
-                                        </label>
-                                    </div>
+                                    <label class="form-check-label" for="emailNotifications">Email Notifications</label>
                                 </div>
                             </div>
                         </div>

@@ -165,6 +165,9 @@
                                 <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#feedbackModal">
                                     <i class="fas fa-plus me-2"></i>Add Question
                                 </button>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#surveyLinkModal">
+                                    <i class="fas fa-link me-2"></i>Add Survey Link
+                                </button>
                             </div>
                         </div>
                         <div id="feedbackList" class="list-group">
@@ -225,6 +228,52 @@
         </div>
     </div>
     <!-- Feedback Modal End-->
+
+    <div class="modal fade" id="surveyLinkModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title">
+                        <i class="fas fa-link me-2"></i>Add Survey Link
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="surveyLinkForm">
+                        <div class="mb-3">
+                            <label for="surveyTitle" class="form-label">Survey Title</label>
+                            <input type="text" class="form-control" id="surveyTitle" name="title" 
+                                   placeholder="Enter survey title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="surveyUrl" class="form-label">Survey URL</label>
+                            <input type="url" class="form-control" id="surveyUrl" name="url" 
+                                   placeholder="https://..." required>
+                            <div class="form-text text-muted">
+                                Enter the full URL to your survey (e.g., Google Forms, Qualtrics)
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="surveyStartDate" class="form-label">Active Start Date</label>
+                            <input type="date" class="form-control" name="startDate" 
+                                   id="surveyStartDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="surveyEndDate" class="form-label">Active End Date</label>
+                            <input type="date" class="form-control" name="endDate" 
+                                   id="surveyEndDate" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary px-4" id="submitSurveyLink">
+                        <i class="fas fa-save me-2"></i>Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-light footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">

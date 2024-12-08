@@ -257,3 +257,61 @@ function showToast(title, message, type = 'info') {
         toastElement.remove();
     });
 }
+
+// Add this after your existing initialization code
+document.getElementById('submitSurveyLink')?.addEventListener('click', function() {
+    const form = document.getElementById('surveyLinkForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    const formData = new FormData(form);
+    const submitButton = this;
+    submitButton.disabled = true;
+
+    fetch('/admin/survey-link', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showToast('Success', 'Survey link added successfully', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('surveyLinkModal')).hide();
+            form.reset();
+            // Optionally refresh the feedback list to show the new survey link
+            initializeDashboard();
+        } else {
+            throw new Error(data.message || 'Failed to add survey link');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error', error.message, 'error');
+    })
+    .finally(() => {
+        submitButton.disabled = false;
+    });
+});
+
+function deleteSurveyLink(id) {
+    if (!confirm('Are you sure you want to delete this survey link?')) return;
+
+    fetch(`/admin/survey-link/${id}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showToast('Success', 'Survey link deleted successfully', 'success');
+            initializeDashboard();
+        } else {
+            throw new Error(data.message || 'Failed to delete survey link');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error', error.message, 'error');
+    });
+}

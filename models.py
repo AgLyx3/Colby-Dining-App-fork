@@ -121,5 +121,13 @@ class WaitTime(db.Model):
     day_of_week = db.Column(db.Integer, nullable = False)
     predicted_wait = db.Column(db.Integer, nullable = False)
 
+class SurveyLink(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    url = db.Column(db.String(500), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    admin_email = db.Column(db.String(255), db.ForeignKey('administrator.admin_email'), nullable=False)
+
 
 

@@ -27,11 +27,12 @@ function updateWaitTimes() {
                             statusText = 'Moderate Traffic';
                         }
                         
+                        // ${Math.round(prediction.wait_time)} min
                         waitTimeHtml = `
                             <div class="wait-time-card">
                                 <div class="location-name">${location}</div>
                                 <div class="wait-time ${statusClass}">
-                                    ${Math.round(prediction.wait_time)} min
+                                    ${prediction.wait_time} min
                                 </div>
                                 <div class="mt-3 text-muted">
                                     Approximate crowd: ~${prediction.crowd} people

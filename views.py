@@ -13,7 +13,7 @@ import os
 import logging
 from auth import admin_required
 from dining_predictor import DiningHallPredictor
-from models import db, FeedbackQuestion, Administrator, FavoriteDish
+from models import db, FeedbackQuestion, Administrator, FavoriteDish, SurveyLink
 from email_utils import EmailSender
 from typing import Dict, List, Optional
 from menu_api import BonAppetitAPI
@@ -500,5 +500,79 @@ def get_favorites():
         
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+    
+@main_blueprint.route('/api/active-survey')
+def get_active_survey():
+    try:
+        active_survey = SurveyLink.query.filter_by(is_active=True).order_by(SurveyLink.created_at.desc()).first()
+        if active_survey:
+            return jsonify({
+                'status': 'success',
+                'survey': {
+                    'title': active_survey.title,
+                    'url': active_survey.url
+                }
+            })
+        return jsonify({
+            'status': 'error',
+            'message': 'No active survey found'
+        }), 404
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+    
+@main_blueprint.route('/admin/survey-link', methods=['POST'])
+@login_required
+@admin_required
+def create_survey_link():
+    try:
+        # Deactivate all existing surveys first
+        SurveyLink.query.update({SurveyLink.is_active: False})
+        
+        # Create new survey link
+        new_survey = SurveyLink(
+            title=request.form.get('title'),
+            url=request.form.get('url'),
+            admin_email=current_user.admin_email,
+            is_active=True
+        )
+        
+        db.session.add(new_survey)
+        db.session.commit()
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Survey link updated successfully'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 400
+
+@main_blueprint.route('/admin/survey-link', methods=['DELETE'])
+@login_required
+@admin_required
+def delete_survey_link():
+    try:
+        # Deactivate all surveys
+        SurveyLink.query.update({SurveyLink.is_active: False})
+        db.session.commit()
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Survey link removed successfully'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 400
 
 
