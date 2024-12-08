@@ -1,8 +1,9 @@
-from app import app, db
-from models import db, WaitTime, Food, Tag
+from app import create_app
+from models import db, WaitTime, Food, Tag, FeedbackQuestion, Response
 from datetime import datetime, time, timedelta
 import random
 
+app = create_app()
 def generate_wait_times():
     locations = ['Dana', 'Roberts', 'Foss']
     meal_times = [
@@ -125,7 +126,63 @@ def generate_foods_and_tags():
     db.session.commit()  
     print(f"Generated {len(foods)} food records with tags.")
 
+def generate_feedabck():
+    questions_data = [
+        {
+            "question_text": "Was the service helpful?",
+            "question_type": "yes-no",
+            "active_start_date": datetime(2024, 1, 1),
+            "active_end_date": datetime(2024, 12, 31),
+            "administrator_id": "yli25@colby.edu",
+            "responses": ["Yes", "No", "Yes"]
+        },
+        {
+            "question_text": "Rate your satisfaction (1-5).",
+            "question_type": "rating",
+            "active_start_date": datetime(2024, 6, 1),
+            "active_end_date": datetime(2024, 12, 31),
+            "administrator_id": "yli25@colby.edu",
+            "responses": ["5", "4", "3", "5", "4"]
+        },
+        {
+            "question_text": "Any additional feedback?",
+            "question_type": "text",
+            "active_start_date": datetime(2024, 1, 1),
+            "active_end_date": datetime(2024, 3, 31),
+            "administrator_id": "yli25@colby.edu",
+            "responses": [
+                "The staff was very friendly.",
+                "Please improve the timing of the service.",
+                "Loved the ambiance!"
+            ]
+        }
+    ]
+
+    # Populate the database
+    for question_data in questions_data:
+        # Create question
+        question = FeedbackQuestion(
+            question_text=question_data["question_text"],
+            question_type=question_data["question_type"],
+            active_start_date=question_data["active_start_date"],
+            active_end_date=question_data["active_end_date"],
+            administrator_id=question_data["administrator_id"],
+        )
+        db.session.add(question)
+        db.session.commit()  # Commit to generate the question ID
+
+        # Add responses for the question
+        for response_text in question_data["responses"]:
+            response = Response(content=response_text, question_id=question.id)
+            db.session.add(response)
+
+    # Commit all responses
+    db.session.commit()
+
+    print("Feedback populated successfully!")
+
 with app.app_context():
     db.create_all()
     generate_wait_times() 
     generate_foods_and_tags()
+    generate_feedabck()

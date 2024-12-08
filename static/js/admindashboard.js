@@ -118,8 +118,14 @@ function updateFeedbackQuestions(questions) {
         deleteButton.title = 'Delete Question';
         deleteButton.onclick = () => deleteQuestion(question.id); // Changed to onclick
 
+        const viewResponsesButton = document.createElement('button');
+        viewResponsesButton.classList.add('btn', 'btn-outline-info');
+        viewResponsesButton.innerHTML = '<i class="fas fa-chart-pie"></i>';
+        viewResponsesButton.title = 'View Responses';
+
         actionButtons.appendChild(editButton);
         actionButtons.appendChild(deleteButton);
+        actionButtons.appendChild(viewResponsesButton)
 
         questionItem.appendChild(questionContent);
         questionItem.appendChild(actionButtons);
@@ -127,7 +133,10 @@ function updateFeedbackQuestions(questions) {
 
         // Add event listener for edit
         editButton.addEventListener('click', () => editQuestion(question));
+        // Add event listener for view response
+        viewResponsesButton.addEventListener('click', () => loadResponses(question.id, question.question_type));
     });
+        
 }
 
 function deleteQuestion(questionId) {
@@ -216,6 +225,125 @@ function setupEventListeners() {
     feedbackModal.addEventListener('hidden.bs.modal', function () {
         document.getElementById('feedbackForm').reset();
     });
+}
+
+let chartInstance;
+
+function loadResponses(questionId, questionType) {
+    console.log('loadResponses function triggered');
+
+    // Show the modal immediately
+    const responsesModal = new bootstrap.Modal(document.getElementById('responsesModal'));
+    responsesModal.show();
+
+    // Set a placeholder or loading message in the modal
+    const questionText = document.getElementById('responseQuestionText');
+    const responseList = document.getElementById('responseList');
+    const responseChart = document.getElementById('responseChart');
+
+    questionText.textContent = 'Loading responses...'; // Placeholder text
+    responseList.style.display = 'none';
+    responseChart.style.display = 'none';
+
+    // Create a URL to fetch responses based on the question ID
+    const url = `/admin/feedback-question/get-response/${questionId}`;
+    console.log(`Making GET request to: ${url}`);  // Log the URL being called
+
+    // Prepare query parameters (question_type will be included in the URL itself)
+    const params = new URLSearchParams({ question_type: questionType });
+
+    // Append query parameters to the URL
+    const finalUrl = `${url}?${params.toString()}`;
+
+    // Fetch responses from the server
+    fetch(finalUrl, {
+        method: 'GET', // This is a GET request
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Handle the data returned by the server
+        if (data.question) {
+            questionText.textContent = data.question; // Set the actual question text
+
+            if (questionType === 'yes-no' || questionType === 'rating') {
+                // Handle Yes/No or Rating question type and display Pie Chart
+                responseList.style.display = 'none';
+                responseChart.style.display = 'block';
+
+                const chartData = processChartData(data.responses, questionType);
+                console.log('Chart data:', chartData); // Debugging response data
+
+                // Destroy previous chart if exists
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
+
+                // Create the Pie Chart using Chart.js
+                const ctx = responseChart.getContext('2d');
+                if (ctx) {
+                    console.log('Chart context retrieved:', ctx);  // Ensure canvas context is retrieved
+                    chartInstance = new Chart(ctx, {
+                        type: 'pie',
+                        data: chartData,
+                    });
+                } else {
+                    console.error('Failed to retrieve canvas context.');
+                }
+            } else if (questionType === 'text') {
+                // Handle Text question type and display as a list
+                responseList.style.display = 'block';
+                responseChart.style.display = 'none'; // Ensure chart is hidden
+
+                // Populate the list with responses
+                responseList.innerHTML = ''; // Clear any existing list items
+                data.responses.forEach(response => {
+                    const li = document.createElement('li');
+                    li.classList.add('list-group-item');
+                    li.textContent = response;
+                    responseList.appendChild(li);
+                });
+            }
+        } else {
+            console.error('Failed to load responses:', data.error || 'Unknown error');
+            questionText.textContent = 'Failed to load responses. Please try again.';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading responses:', error);
+        questionText.textContent = 'An error occurred while loading responses.';
+    });
+}
+
+function processChartData(responses, questionType) {
+    let chartData = {
+        labels: [],
+        datasets: [{
+            data: [],
+            backgroundColor: ['#ff9999', '#66b3ff', '#99ff99', '#ffcc99', '#c2c2f0'], // Example colors
+            hoverBackgroundColor: ['#ff6666', '#3399ff', '#66ff66', '#ff9933', '#9999ff']
+        }]
+    };
+
+    console.log('Processing chart data for:', questionType); // Debugging chart processing
+
+    if (questionType === 'yes-no') {
+        chartData.labels = ['Yes', 'No'];
+        chartData.datasets[0].data = [
+            responses['yes'] || 0,
+            responses['no'] || 0
+        ];
+    } else if (questionType === 'rating') {
+        chartData.labels = ['1', '2', '3', '4', '5'];
+        chartData.datasets[0].data = [
+            responses['1'] || 0,
+            responses['2'] || 0,
+            responses['3'] || 0,
+            responses['4'] || 0,
+            responses['5'] || 0
+        ];
+    }
+
+    return chartData;
 }
 
 function showToast(title, message, type = 'info') {

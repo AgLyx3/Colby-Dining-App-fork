@@ -76,8 +76,14 @@ class Administrator(db.Model, UserMixin):
     picture = db.Column(db.String(255))  # Google profile picture URL
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
-    feedback = db.relationship('Feedback', backref='administrator')
-    feedback_questions = db.relationship('FeedbackQuestion', backref='administrator')
+    
+    # Relationship with FeedbackQuestion
+    feedback_questions = db.relationship(
+        'FeedbackQuestion', 
+        backref='administrator',
+        cascade='all, delete-orphan',
+        lazy='dynamic'
+    )
 
     def get_id(self):
         """Required for Flask-Login"""
@@ -85,15 +91,6 @@ class Administrator(db.Model, UserMixin):
 
     def __repr__(self):
         return f'<Administrator {self.admin_email}>'
-
-class Feedback(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    admin_email = db.Column(db.String(255), db.ForeignKey('administrator.admin_email'), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    num_responses = db.Column(db.Integer)
-    created_at = db.Column(db.Date, nullable=False)
-    update_at = db.Column(db.Date, nullable=False)
-    response = db.relationship('Response', backref='feedback')
 
 class FeedbackQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -105,11 +102,21 @@ class FeedbackQuestion(db.Model):
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     administrator_id = db.Column(db.String(255), db.ForeignKey('administrator.admin_email'), nullable=False)
 
+    # Relationship with Response (one-to-many)
+    responses = db.relationship(
+        'Response', 
+        backref='feedback_question', 
+        cascade='all, delete-orphan', 
+        lazy='dynamic'
+    )
+
 
 class Response(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     content = db.Column(db.Text, nullable = False)
-    feedback_id = db.Column(db.Integer, db.ForeignKey('feedback.id'), nullable = False)
+    #feedback_id = db.Column(db.Integer, db.ForeignKey('feedback.id'), nullable=False)
+    question_id = db.Column(db.Integer, db.ForeignKey('feedback_question.id'), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 class WaitTime(db.Model):
     id = db.Column(db.Integer, primary_key = True)

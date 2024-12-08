@@ -226,6 +226,30 @@
     </div>
     <!-- Feedback Modal End-->
 
+    <!-- Modal for viewing responses -->
+    <div class="modal fade" id="responsesModal" tabindex="-1" aria-labelledby="responsesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="responsesModalLabel">Responses</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 id="responseQuestionText"></h6>
+                    
+                    <!-- Pie Chart container -->
+                    <canvas id="responseChart" style="display:none;"></canvas>
+                    
+                    <!-- Text response container -->
+                    <ul id="responseList" class="list-group" style="display:none;"></ul> <!-- Hide list by default -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-light footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">
         <div class="container py-5">
