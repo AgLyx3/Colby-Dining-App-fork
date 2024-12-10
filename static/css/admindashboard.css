@@ -126,6 +126,12 @@ body {
     background-color: #f1f3f5;
 }
 
+.inactive {
+    opacity: 0.5;  /* Reduced opacity */
+}
+
+
+
 /* Modal Styles */
 .modal-content {
     border: none;

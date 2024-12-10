@@ -126,13 +126,14 @@ def generate_foods_and_tags():
     db.session.commit()  
     print(f"Generated {len(foods)} food records with tags.")
 
-def generate_feedabck():
+def generate_feedback():
     questions_data = [
         {
             "question_text": "Was the service helpful?",
             "question_type": "yes-no",
             "active_start_date": datetime(2024, 1, 1),
             "active_end_date": datetime(2024, 12, 31),
+            "is_active": True,  # Active
             "administrator_id": "yli25@colby.edu",
             "responses": ["Yes", "No", "Yes"]
         },
@@ -141,6 +142,7 @@ def generate_feedabck():
             "question_type": "rating",
             "active_start_date": datetime(2024, 6, 1),
             "active_end_date": datetime(2024, 12, 31),
+            "is_active": True,  # Active
             "administrator_id": "yli25@colby.edu",
             "responses": ["5", "4", "3", "5", "4"]
         },
@@ -149,6 +151,7 @@ def generate_feedabck():
             "question_type": "text",
             "active_start_date": datetime(2024, 1, 1),
             "active_end_date": datetime(2024, 3, 31),
+            "is_active": False,  # Inactive
             "administrator_id": "yli25@colby.edu",
             "responses": [
                 "The staff was very friendly.",
@@ -166,6 +169,7 @@ def generate_feedabck():
             question_type=question_data["question_type"],
             active_start_date=question_data["active_start_date"],
             active_end_date=question_data["active_end_date"],
+            is_active=question_data["is_active"],  # Set is_active
             administrator_id=question_data["administrator_id"],
         )
         db.session.add(question)
@@ -181,9 +185,10 @@ def generate_feedabck():
 
     print("Feedback populated successfully!")
 
+
 with app.app_context():
     db.drop_all
     db.create_all()
     # generate_wait_times() 
     # generate_foods_and_tags()
-    generate_feedabck()
+    generate_feedback()

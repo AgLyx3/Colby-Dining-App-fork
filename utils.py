@@ -1,4 +1,7 @@
-from models import db, Tag, Food
+from models import db, Tag, Food, FeedbackQuestion
+from apscheduler.schedulers.background import BackgroundScheduler
+from flask import Flask
+from datetime import datetime
 
 def create_tags():
     if Tag.query.count() == 0:  # Check if tags already exist
@@ -75,4 +78,27 @@ def get_all_foods():
     """
     foods = Food.query.all()
     return format_menu_items(foods)
+
+def deactivate_expired_questions():
+    today = datetime.today().date()
+    
+    expired_questions = FeedbackQuestion.query.filter(
+        FeedbackQuestion.active_end_date < today, 
+        FeedbackQuestion.is_active == True
+    ).all()
+
+    if not expired_questions:
+        print("No expired questions to deactivate.")
+        return
+
+    for question in expired_questions:
+        question.is_active = False
+
+    try:
+        db.session.commit()
+        print(f'{len(expired_questions)} questions deactivated due to expired end date.')
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error deactivating questions: {e}")
+
 

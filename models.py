@@ -100,6 +100,7 @@ class FeedbackQuestion(db.Model):
     active_end_date = db.Column(db.Date, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True)
     administrator_id = db.Column(db.String(255), db.ForeignKey('administrator.admin_email'), nullable=False)
 
     # Relationship with Response (one-to-many)

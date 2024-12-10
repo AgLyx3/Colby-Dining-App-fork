@@ -17,6 +17,7 @@ from models import db, FeedbackQuestion, Administrator, FavoriteDish, SurveyLink
 from email_utils import EmailSender
 from typing import Dict, List, Optional
 from menu_api import BonAppetitAPI
+from utils import deactivate_expired_questions
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -137,24 +138,102 @@ def create_feedback_question():
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 400
 
-@main_blueprint.route('/admin/feedback-question/<int:question_id>', methods=['DELETE'])
+
+@main_blueprint.route('/admin/feedback-question/<int:question_id>/deactivate', methods=['PUT'])
+@login_required
+@admin_required
+def deactivate_feedback_question(question_id):
+    try:
+        question = FeedbackQuestion.query.get_or_404(question_id)
+        
+        # Ensure the user has permission to deactivate the question
+        if question.administrator_id != current_user.admin_email:
+            return jsonify({'status': 'error', 'message': 'Unauthorized to deactivate this question'}), 403
+
+        # Deactivate the question if it is active
+        if question.is_active:
+            question.is_active = False
+            db.session.commit()
+            return jsonify({'status': 'success', 'message': 'Question deactivated successfully'})
+        else:
+            return jsonify({'status': 'error', 'message': 'Question is already deactivated'}), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 400
+
+@main_blueprint.route('/admin/feedback-question/<int:question_id>/delete', methods=['DELETE'])
 @login_required
 @admin_required
 def delete_feedback_question(question_id):
     try:
         question = FeedbackQuestion.query.get_or_404(question_id)
+
+        # Ensure the user has permission to delete the question
         if question.administrator_id != current_user.admin_email:
             return jsonify({'status': 'error', 'message': 'Unauthorized to delete this question'}), 403
+
+        # Only delete the question if it is already deactivated (inactive)
+        if not question.is_active:
+            db.session.delete(question)
+            db.session.commit()
+            return jsonify({'status': 'success', 'message': 'Question deleted successfully'})
+        else:
+            return jsonify({'status': 'error', 'message': 'Cannot delete an active question'}), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 400
+    
+@main_blueprint.route('/admin/feedback-question/<int:question_id>/reactivate', methods=['PUT'])
+@login_required
+@admin_required
+def reactivate_feedback_question(question_id):
+    try:
+        question = FeedbackQuestion.query.get_or_404(question_id)
         
-        db.session.delete(question)
+        # Check if the current user is the administrator who created the question
+        if question.administrator_id != current_user.admin_email:
+            return jsonify({'status': 'error', 'message': 'Unauthorized to reactivate this question'}), 403
+
+        # Reactivate the question
+        question.is_active = True
         db.session.commit()
-        return jsonify({'status': 'success', 'message': 'Question deleted successfully'})
+
+        return jsonify({'status': 'success', 'message': 'Question reactivated successfully'})
+    
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 400
 
+
+@main_blueprint.route('/admin/feedback-question/<int:question_id>', methods=['GET'])
+def get_feedback_question(question_id):
+    try:
+        # Fetch the question by ID
+        question = FeedbackQuestion.query.get_or_404(question_id)
+        
+        # Return the question details in the response
+        return jsonify({
+            'status': 'success',
+            'question': {
+                'id': question.id,
+                'question_text': question.question_text,
+                'question_type': question.question_type,
+                'active_start_date': question.active_start_date.isoformat(),
+                'active_end_date': question.active_end_date.isoformat(),
+                'created_at': question.created_at.isoformat() if question.created_at else None,
+                'is_active': question.is_active,
+                'administrator_id': question.administrator_id
+            }
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 @main_blueprint.route('/api/admin/feedback-questions', methods=['GET'])
 def get_feedback_questions():
+    deactivate_expired_questions()
+
     try:
         questions = FeedbackQuestion.query.order_by(FeedbackQuestion.created_at.desc()).all()
         return jsonify({
@@ -165,7 +244,9 @@ def get_feedback_questions():
                 'question_type': q.question_type,
                 'active_start_date': q.active_start_date.isoformat(),
                 'active_end_date': q.active_end_date.isoformat(),
-                'created_at': q.created_at.isoformat() if q.created_at else None
+                'created_at': q.created_at.isoformat() if q.created_at else None,
+                'is_active': q.is_active,
+                'administrator_id': q.administrator_id
             } for q in questions]
         })
     except Exception as e:
