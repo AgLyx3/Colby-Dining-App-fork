@@ -1008,21 +1008,13 @@ class PopularDishesChart {
                         '#3498db'       // Light blue
                     ],
                     borderRadius: 2,
-                    barThickness: 25,
-                    maxBarThickness: 25
+                    barThickness: 35,
+                    maxBarThickness: 35
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
-                // layout: {
-                //     padding: {
-                //         top: 20,
-                //         right: 25,
-                //         bottom: 55,
-                //         left: 25
-                //     }
-                // },
             
                 plugins: {
                     legend: {
