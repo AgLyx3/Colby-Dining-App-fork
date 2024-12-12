@@ -59,6 +59,7 @@
                     <div class="navbar-nav ms-auto py-0 pe-4">
                         <a href="{{ url_for('main.index') }}" class="nav-item nav-link active">Home</a>    
                         <a href="{{ url_for('main.menu_page') }}" class="nav-item nav-link">Menu</a>
+                        <a href="{{ url_for('main.news') }}" class="nav-item nav-link">News</a>
                         <a href="{{ url_for('main.contact') }}" class="nav-item nav-link">Contact</a>
                     </div>
                     {% if current_user.is_authenticated %}
@@ -471,6 +472,15 @@
         <!-- Back to Top -->
         <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
     </div>
+
+    <div id="feedback-popup" style="display: none;" class="popup-container">
+        <div class="popup">
+            <p id="popup-question-text"></p>
+            <div id="popup-options"></div>
+            <button id="submit-feedback">Submit</button>
+        </div>
+    </div>
+    <script src="../static/js/feedback-popup.js"></script>
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>

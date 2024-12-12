@@ -57,6 +57,7 @@
                     <div class="navbar-nav ms-auto py-0 pe-4">
                         <a href="{{ url_for('main.index') }}" class="nav-item nav-link">Home</a>    
                         <a href="{{ url_for('main.menu_page') }}" class="nav-item nav-link">Menu</a>
+                        <a href="{{ url_for('main.news') }}" class="nav-item nav-link">News</a>
                         <a href="{{ url_for('main.contact') }}" class="nav-item nav-link active">Contact</a>
                     </div>
                     {% if current_user.is_authenticated %}
@@ -234,6 +235,7 @@
                             <div class="footer-menu">
                                 <a href="{{ url_for('main.index') }}" style="margin-right: 15px; padding-right: 15px; border-right: 1px solid rgba(255, 255, 255, .1); color: #fff; text-decoration: none;">Home</a>
                                 <a href="{{ url_for('main.menu') }}" style="margin-right: 15px; padding-right: 15px; border-right: 1px solid rgba(255, 255, 255, .1); color: #fff; text-decoration: none;">Menu</a>
+                                <a href="{{ url_for('main.news') }}" class="nav-item nav-link">News</a>
                                 <a href="{{ url_for('main.contact') }}" style="color: #fff; text-decoration: none;">Contact</a>
                             </div>
                         </div>

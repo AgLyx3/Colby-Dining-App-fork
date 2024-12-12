@@ -102,6 +102,17 @@ class Response(db.Model):
     content = db.Column(db.Text, nullable = False)
     feedback_id = db.Column(db.Integer, db.ForeignKey('feedback.id'), nullable = False)
 
+class YesNoResponse(Response):
+    is_yes = db.Column(db.Boolean, nullable=False)
+
+class RatingResponse(Response):
+    rating = db.Column(db.Integer, nullable=False)
+
+
+class ShortAnswerResponse(Response):
+    answer_text = db.Column(db.Text, nullable=False)
+
+
 class WaitTime(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     location = db.Column(db.String(255), nullable = False)
