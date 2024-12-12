@@ -17,7 +17,7 @@ class SchedulerService:
             # Schedule job for 7 AM local time
             self.scheduler.add_job(
                 func=lambda: EmailSender.check_favorite_dishes(app),
-                trigger=CronTrigger(hour=7, minute=0),
+                trigger=CronTrigger(hour=10, minute=0),
                 id='favorite_dishes_notification',
                 name='Daily favorite dishes notifications',
                 replace_existing=True,

@@ -194,8 +194,8 @@ def reactivate_feedback_question(question_id):
         question = FeedbackQuestion.query.get_or_404(question_id)
         
         # Check if the current user is the administrator who created the question
-        if question.administrator_id != current_user.admin_email:
-            return jsonify({'status': 'error', 'message': 'Unauthorized to reactivate this question'}), 403
+        # if question.administrator_id != current_user.admin_email:
+        #     return jsonify({'status': 'error', 'message': 'Unauthorized to reactivate this question'}), 403
 
         # Reactivate the question
         question.is_active = True
@@ -860,10 +860,11 @@ def submit_feedback_response():
                 'status': 'error',
                 'message': 'Invalid or inactive question'
             }), 400
-        if content.type == 'text':
-            user_text = content.response
 
-            key=os.getenv('GEMINI_KEY')
+        if question.question_type == 'text':
+            user_text = content
+
+            key = os.getenv('GEMINI_KEY')
             genai.configure(api_key=key)
             model = genai.GenerativeModel("gemini-1.5-flash")
 
