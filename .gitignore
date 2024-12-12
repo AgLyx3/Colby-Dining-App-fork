@@ -1,5 +1,4 @@
 data/
-instance/
 .idea/
 __pycache__/
 .env
