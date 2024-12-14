@@ -1,80 +1,89 @@
+"""
+Filename:
+    __init__.py
+"""
+import os
+import logging
+import sys
 from flask import Flask
+from dotenv import load_dotenv
 from website.scheduler import SchedulerService
 from website.models import db
-from flask_login import LoginManager
 from website.views import main_blueprint
 from website.menu_routes import menu_bp
 from website.utils import create_tags
 from website.auth import auth_bp, google_bp, login_manager, init_admin_model
-from dotenv import load_dotenv
-import os
-import logging
-import sys
+
 y = SchedulerService()
 
-def create_app(test_config=None):
-   # Load environment variables
-   load_dotenv()
-   
-   # Initialize Flask app
-   app = Flask(__name__, static_folder='static')
-   with app.app_context():
-    y.init_app(app)
-   
-   # Configure logging
-   logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-   logger = logging.getLogger(__name__)
-   logger.info("Starting application initialization...")
 
-   # Load configurations
-   if test_config is None:
-       app.config.from_mapping(
-           SECRET_KEY=os.getenv('SECRET_KEY'),
-           SQLALCHEMY_DATABASE_URI=os.getenv('SQLALCHEMY_DATABASE_URI'),
-           SQLALCHEMY_TRACK_MODIFICATIONS=False,
-           GOOGLE_OAUTH_CLIENT_ID=os.getenv('GOOGLE_OAUTH_CLIENT_ID'),
-           GOOGLE_OAUTH_CLIENT_SECRET=os.getenv('GOOGLE_OAUTH_CLIENT_SECRET'),
-           OAUTHLIB_RELAX_TOKEN_SCOPE=os.getenv('OAUTHLIB_RELAX_TOKEN_SCOPE', True),
-           OAUTHLIB_INSECURE_TRANSPORT=os.getenv('OAUTHLIB_INSECURE_TRANSPORT', False),
-           MENU_API_USERNAME=os.getenv('MENU_API_USERNAME'),
-           MENU_API_PASSWORD=os.getenv('MENU_API_PASSWORD'),
-           CACHE_DIR=os.getenv('CACHE_DIR', 'instance/cache')
-       )
-       
-       # JawsDB Support 
+def create_app(test_config=None):
+    """
+    Create app
+    """
+    # Load environment variables
+    load_dotenv()
+    # Initialize Flask app
+    app = Flask(__name__, static_folder='static')
+    with app.app_context():
+        y.init_app(app)
+
+    # Configure logging
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
+    logger.info("Starting application initialization...")
+
+    # Load configurations
+    if test_config is None:
+        app.config.from_mapping(
+            SECRET_KEY=os.getenv('SECRET_KEY'),
+            SQLALCHEMY_DATABASE_URI=os.getenv('SQLALCHEMY_DATABASE_URI'),
+            SQLALCHEMY_TRACK_MODIFICATIONS=False,
+            GOOGLE_OAUTH_CLIENT_ID=os.getenv('GOOGLE_OAUTH_CLIENT_ID'),
+            GOOGLE_OAUTH_CLIENT_SECRET=os.getenv('GOOGLE_OAUTH_CLIENT_SECRET'),
+            OAUTHLIB_RELAX_TOKEN_SCOPE=os.getenv('OAUTHLIB_RELAX_TOKEN_SCOPE', True),
+            OAUTHLIB_INSECURE_TRANSPORT=os.getenv('OAUTHLIB_INSECURE_TRANSPORT', False),
+            MENU_API_USERNAME=os.getenv('MENU_API_USERNAME'),
+            MENU_API_PASSWORD=os.getenv('MENU_API_PASSWORD'),
+            CACHE_DIR=os.getenv('CACHE_DIR', 'instance/cache')
+        )
+        """
+       # JawsDB Support
        # database_url = os.getenv('JAWSDB_URL')
        # if database_url:
        #     database_url = database_url.replace('mysql://', 'mysql+mysqlconnector://')
        #     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
        #     logger.info("Using JawsDB URL for database connection")
        # else:
-        #    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
-        #    logger.info("Using default database URL")
-   else:
-       app.config.update(test_config)
+       #    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+       #    logger.info("Using default database URL")
+       """
+    else:
+        app.config.update(test_config)
 
-   # Initialize extensions
-   try:
-       db.init_app(app)
-       login_manager.init_app(app)
-       init_admin_model()
-       logger.info("Core services initialized successfully")
-   except Exception as e:
-       logger.error(f"Initialization error: {e}")
-       raise
+    # Initialize extensions
+    try:
+        db.init_app(app)
+        login_manager.init_app(app)
+        init_admin_model()
+        logger.info("Core services initialized successfully")
+    except Exception as e:
+        logger.error(f"Initialization error: {e}")
+        raise
 
-   # Register blueprints
-   app.register_blueprint(auth_bp)
-   app.register_blueprint(google_bp, url_prefix="/login")
-   app.register_blueprint(main_blueprint)
-   app.register_blueprint(menu_bp, url_prefix='/api/menu')
+    # Register blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(google_bp, url_prefix="/login")
+    app.register_blueprint(main_blueprint)
+    app.register_blueprint(menu_bp, url_prefix='/api/menu')
 
-   app.config.update({
+    app.config.update({
         'MENU_API_USERNAME': os.getenv('MENU_API_USERNAME'),
         'MENU_API_PASSWORD': os.getenv('MENU_API_PASSWORD')
     })
 
-   return app
+    return app
+
 
 if __name__ == '__main__':
     app = create_app()

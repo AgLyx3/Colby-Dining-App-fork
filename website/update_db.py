@@ -1,3 +1,7 @@
+"""
+Filename:
+    update_db.py
+"""
 from website import create_app, db
 from website.models import Administrator
 import traceback

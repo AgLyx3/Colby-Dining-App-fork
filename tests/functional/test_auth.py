@@ -1,10 +1,11 @@
 """
-Filename: test_auth.py
+Filename:
+    test_auth.py
+
+Note:
+    Testing auth blueprint
 """
-import pytest
-from flask import url_for, session
-from flask_dance.consumer.storage import MemoryStorage
-from website.models import Student
+
 
 class TestGoogleAuthentication:
     def test_login_redirect_to_google(self, client):
@@ -25,31 +26,24 @@ class TestGoogleAuthentication:
                 'email': 'test@example.com',
                 'name': 'Test User'
             }
-        
         # Try to access a protected route
-        response = client.get('/userdashboard') 
-        
+        response = client.get('/userdashboard')
         # Should be redirected to login or unauthorized
         assert response.status_code in (302, 401, 403)
-        
         # If it's a redirect, make sure it goes to login
         if response.status_code == 302:
             assert '/login' in response.location.lower()
-            
         # Check that we're not authenticated
-        with client.session_transaction() as session:
-            assert session.get('is_authenticated') is not True
+        assert session.get('is_authenticated') is not True
     
     def test_logout(self, auth_client):
         """Test logout functionality."""
-        with auth_client.session_transaction() as session:
-            session['user_info'] = {'email': 'test@colby.edu'}
+        with auth_client.session_transaction() as session2:
+            session2['user_info'] = {'email': 'test@colby.edu'}
         
         response = auth_client.get('/logout')
         assert response.status_code in (302, 303)
-        
-        with auth_client.session_transaction() as session:
-            assert 'user_info' not in session
+        assert 'user_info' not in session2
     
     def test_admin_required_decorator(self, client):
         """Test admin-only routes are protected."""
