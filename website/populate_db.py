@@ -10,6 +10,7 @@ from .models import WaitTime, Food, Tag, FeedbackQuestion, Response
 
 app = create_app()
 def generate_wait_times():
+    """generate wait times"""
     locations = ['Dana', 'Roberts', 'Foss']
     meal_times = [
         (time(7, 0), time(10, 0)),   # Breakfast
@@ -45,6 +46,7 @@ def generate_wait_times():
     print(f"Generated {WaitTime.query.count()} wait time records.")
 
 def generate_foods_and_tags():
+    """generate food and tags"""
     # Create tags
     meal_tags = ['Breakfast', 'Brunch', 'Lunch', 'Dinner', 'Dessert', 'Late Night']
     diet_tags = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Contains Nuts', 'Dairy-Free', 'Halal', 'Kosher', 'Low Carb', 'High Protein', 'Organic']
@@ -132,6 +134,7 @@ def generate_foods_and_tags():
     print(f"Generated {len(foods)} food records with tags.")
 
 def generate_feedback():
+    """generate feedback"""
     questions_data = [
         {
             "question_text": "Was the service helpful?",

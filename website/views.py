@@ -113,7 +113,10 @@ def menu():
     all_tags = Tag.query.all()
 
     # Pass the filtered food items and selected tags to the template
-    return render_template('menu.html', foods=filtered_foods, selected_tags=selected_tags, all_tags=all_tags)
+    return render_template('menu.html',
+                           foods=filtered_foods,
+                           selected_tags=selected_tags,
+                           all_tags=all_tags)
 
 
 @main_blueprint.route('/contact')
@@ -150,8 +153,11 @@ def create_feedback_question():
         new_question = FeedbackQuestion(
             question_text=request.form.get('questionText'),
             question_type=request.form.get('questionType'),
-            active_start_date=datetime.strptime(request.form.get('activeStartDate'), '%Y-%m-%d').date(),
-            active_end_date=datetime.strptime(request.form.get('activeEndDate'), '%Y-%m-%d').date(),
+            active_start_date=datetime.strptime(
+                request.form.get('activeStartDate'),
+                '%Y-%m-%d').date(),
+            active_end_date=datetime.strptime(request.form.get('activeEndDate'),
+                                              '%Y-%m-%d').date(),
             administrator_id=current_user.admin_email
         )
         db.session.add(new_question)
@@ -169,11 +175,6 @@ def deactivate_feedback_question(question_id):
     """deactivate feedback question"""
     try:
         question = FeedbackQuestion.query.get_or_404(question_id)
-
-        # Ensure the user has permission to deactivate the question
-        # if question.administrator_id != current_user.admin_email:
-        #     return jsonify({'status': 'error', 'message': 'Unauthorized to deactivate this question'}), 403
-
         # Deactivate the question if it is active
         if question.is_active:
             question.is_active = False
@@ -197,15 +198,15 @@ def delete_feedback_question(question_id):
 
         # Ensure the user has permission to delete the question
         if question.administrator_id != current_user.admin_email:
-            return jsonify({'status': 'error', 'message': 'Unauthorized to delete this question'}), 403
+            return jsonify(status='error', message='Unauthorized to delete this question'), 403
 
         # Only delete the question if it is already deactivated (inactive)
         if not question.is_active:
             db.session.delete(question)
             db.session.commit()
-            return jsonify({'status': 'success', 'message': 'Question deleted successfully'})
+            return jsonify(status='success', message='Question deleted successfully')
         else:
-            return jsonify({'status': 'error', 'message': 'Cannot delete an active question'}), 400
+            return jsonify(status='error', message='Cannot delete an active question'), 400
 
     except Exception as e:
         db.session.rollback()
@@ -222,8 +223,7 @@ def reactivate_feedback_question(question_id):
         # Reactivate the question
         question.is_active = True
         db.session.commit()
-
-        return jsonify({'status': 'success', 'message': 'Question reactivated successfully'})
+        return jsonify(status='success', message='Question reactivated successfully')
 
     except Exception as e:
         db.session.rollback()
@@ -335,15 +335,6 @@ def get_responses(question_id):
 def export_responses(question_id):
     """export responses"""
     response_data = get_responses(question_id)
-    # if error_message:
-    #     return jsonify({'error': error_message}), status_code
-
-    # # Convert response data to JSON (already serialized in get_response_data)
-    # return jsonify({
-    #     "status": "success",
-    #     **response_data  # Merge response data into the final payload
-    # }), 200
-
     return response_data
 
 
@@ -484,10 +475,8 @@ def get_current_menus():
             username=current_app.config['MENU_API_USERNAME'],
             password=current_app.config['MENU_API_PASSWORD']
         )
-
         date = datetime.now().strftime('%Y-%m-%d')
         menus = menu_service.get_all_dining_hall_menus(date)
-
         return jsonify({
             'status': 'success',
             'date': date,
@@ -508,15 +497,12 @@ def get_dining_hall_menu(dining_hall):
             username=current_app.config['MENU_API_USERNAME'],
             password=current_app.config['MENU_API_PASSWORD']
         )
-
         date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
-        logger.info(f"Fetching menu for {dining_hall} on {date}")
-
+        logger.info("Fetching menu for %s on %s", dining_hall, date)
         # Get correct cafe ID
         cafe_id = menu_service.DINING_HALLS.get(dining_hall)
         if not cafe_id:
             return jsonify({'status': 'error', 'message': 'Invalid dining hall'}), 400
-
         menu_data = menu_service.get_menu(cafe_id, date)
         if menu_data:
             processed_menu = menu_service.process_menu_data(menu_data)
@@ -531,7 +517,7 @@ def get_dining_hall_menu(dining_hall):
         }), 404
 
     except Exception as e:
-        logger.error(f"Error fetching menu: {str(e)}")
+        logger.error("Error fetching menu: %s", str(e))
         return jsonify({
             'status': 'error',
             'message': str(e)
@@ -549,15 +535,12 @@ def get_weekly_menu(dining_hall: str):
                 'status': 'error',
                 'message': 'Invalid dining hall'
             }), 400
-
         # Calculate date range
         today = datetime.now().date()
         dates = [(today + timedelta(days=i)).strftime('%Y-%m-%d')
                  for i in range(7)]
-
         weekly_menu = {}
         cafe_id = current_app.menu_service.DINING_HALLS[dining_hall]
-
         for date in dates:
             # Try cache first
             cached_menu = current_app.menu_cache.get_cached_menu(date, dining_hall)
@@ -890,7 +873,6 @@ def submit_feedback_response():
 
         # Get current date for checking
         current_date = datetime.now().date()
-
         # Check if user has already submitted today
         existing_today = Response.query \
             .filter(cast(Response.created_at, Date) == current_date) \
@@ -901,7 +883,6 @@ def submit_feedback_response():
                 'status': 'error',
                 'message': 'Daily feedback limit reached'
             }), 400
-
         # Check if question exists and is active
         question = FeedbackQuestion.query.get(question_id)
         # if not question or not question.is_active:
@@ -945,5 +926,5 @@ def submit_feedback_response():
 
     except Exception as e:
         db.session.rollback()
-        logger.error(f"Error submitting feedback: {str(e)}")
+        logger.error("Error fetching menu: %s", str(e))
         return jsonify({'status': 'error', 'message': str(e)}), 500
