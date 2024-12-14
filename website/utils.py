@@ -3,8 +3,6 @@ Filename:
     utils.py
 """
 from .models import Tag, Food, FeedbackQuestion
-from apscheduler.schedulers.background import BackgroundScheduler
-from flask import Flask
 from datetime import datetime
 from website import db
 
