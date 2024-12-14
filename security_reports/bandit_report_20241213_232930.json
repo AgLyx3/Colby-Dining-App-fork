@@ -1,0 +1,21 @@
+{
+  "generated_at": "2024-12-13T23:29:30.970563",
+  "issues": [
+    {
+      "text": "Possible hardcoded password: 'snft lurw wmsw uzov'",
+      "severity": "LOW",
+      "confidence": "MEDIUM",
+      "filename": "website/email_utils.py",
+      "line_number": 20,
+      "code": null
+    },
+    {
+      "text": "Possible hardcoded password: 'G5YTx1652Xr2ZdaPST+a'",
+      "severity": "LOW",
+      "confidence": "MEDIUM",
+      "filename": "website/menu_routes.py",
+      "line_number": 15,
+      "code": null
+    }
+  ]
+}

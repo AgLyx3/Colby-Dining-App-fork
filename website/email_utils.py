@@ -4,6 +4,8 @@ Filename:
 """
 import logging
 from website import db
+import os
+from dotenv import load_dotenv
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -16,8 +18,8 @@ class EmailSender:
     def __init__(self):
         self.smtp_server = "smtp.gmail.com"
         self.smtp_port = 587
-        self.sender_email = "colbydining.feedback@gmail.com" 
-        self.sender_password = "snft lurw wmsw uzov"
+        self.sender_email = os.getenv('EMAIL_USERNAME')
+        self.sender_password = os.getenv('EMAIL_PASSWORD')
         
     def send_feedback_email(self, name, email, feedback_type, message):
         try:
