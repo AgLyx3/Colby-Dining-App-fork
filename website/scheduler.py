@@ -1,7 +1,7 @@
 import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-#from .email_utils import EmailSender
+from .email_utils import EmailSender
 
 
 # scheduler.py

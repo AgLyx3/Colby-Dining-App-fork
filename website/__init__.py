@@ -1,5 +1,4 @@
 from flask import Flask
-#from .scheduler import SchedulerService
 from flask_login import LoginManager
 from dotenv import load_dotenv
 import os
@@ -7,17 +6,19 @@ import logging
 import sys
 from flask_sqlalchemy import SQLAlchemy
 
-#y = SchedulerService()
+
 db = SQLAlchemy()
 
 def create_app(test_config=None):
    # Load environment variables
    load_dotenv()
    
+   from .scheduler import SchedulerService
+   y = SchedulerService()
    # Initialize Flask app
    app = Flask(__name__, static_folder='static')
-   #with app.app_context():
-    #y.init_app(app)
+   with app.app_context():
+    y.init_app(app)
    
    # Configure logging
    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
