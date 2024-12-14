@@ -117,13 +117,13 @@ def auth_client(client):
 
 
 @pytest.fixture
-def admin_client(newClient):
+def admin_client(client):
     """Create an admin test client."""
-    with newClient.session_transaction() as session:
+    with client.session_transaction() as session:
         session['google_oauth_token'] = {'access_token': 'fake-token'}
         session['user_info'] = {
             'email': 'admin@colby.edu',
             'name': 'Admin User'
         }
         session['is_admin'] = True
-    return newClient
+    return client
