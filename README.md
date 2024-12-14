@@ -43,8 +43,8 @@ The Colby Dining App is a comprehensive dining management system designed for Co
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/colby-dining-app.git
-cd colby-dining-app
+git clone https://github.com/AgLyx3/Colby-Dining-App-fork.git
+cd Colby-Dining-App-fork
 ```
 
 2. Create a virtual environment:
