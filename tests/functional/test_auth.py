@@ -39,11 +39,15 @@ class TestGoogleAuthentication:
     
     def test_logout(self, auth_client):
         """Test logout functionality."""
-        with auth_client.session_transaction() as session3:
-            session3['user_info'] = {'email': 'test@colby.edu'}
+        with auth_client.session_transaction() as session:
+            session['user_info'] = {'email': 'test@colby.edu'}
+
         response = auth_client.get('/logout')
+        
         assert response.status_code in (302, 303)
-        assert 'user_info' not in session3
+        
+        with auth_client.session_transaction() as session:
+            assert 'user_info' not in session
     
     def test_admin_required_decorator(self, client):
         """Test admin-only routes are protected."""
@@ -73,3 +77,5 @@ class TestGoogleAuthentication:
             }
         response = client.get('/')
         assert response.status_code in (200, 302)
+
+
