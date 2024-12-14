@@ -92,15 +92,15 @@ def db(app):
 
 
 @pytest.fixture
-def client(app):
+def client(app2):
     """Create a test client for the app."""
-    return app.test_client()
+    return app2.test_client()
 
 
 @pytest.fixture
-def runner(app):
+def runner(app3):
     """Create a test runner for the app's Click commands."""
-    return app.test_cli_runner()
+    return app3.test_cli_runner()
 
 
 @pytest.fixture
@@ -116,13 +116,13 @@ def auth_client(client):
 
 
 @pytest.fixture
-def admin_client(client):
+def admin_client(newClient):
     """Create an admin test client."""
-    with client.session_transaction() as session:
+    with newClient.session_transaction() as session:
         session['google_oauth_token'] = {'access_token': 'fake-token'}
         session['user_info'] = {
             'email': 'admin@colby.edu',
             'name': 'Admin User'
         }
         session['is_admin'] = True
-    return client
+    return newClient
