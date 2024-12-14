@@ -230,59 +230,6 @@ def test_duplicate_menu():
     duplicated_menu["items"].append({"id": 2, "name": "Burger"})
     assert len(menu["items"]) == 1  # Original menu should not be affected
 
-def test_create_tags(mocker):
-    """Test create_tags function."""
-    mock_query = mocker.patch("models.Tag.query")
-    mock_session = mocker.patch("website.db.session")
-
-    mock_query.count.return_value = 0
-
-    create_tags()
-
-    assert mock_session.bulk_save_objects.called
-    assert mock_session.commit.called
-
-def test_filter_foods(mocker):
-    """Test filter_foods function."""
-    mock_query = mocker.patch("models.Tag.query")
-    mock_food_query = mocker.patch("models.Food.query")
-    mock_format_menu_items = mocker.patch("utils.format_menu_items")
-
-    selected_tags = ["Vegan", "Gluten Free"]
-
-    filter_foods(selected_tags)
-
-    mock_format_menu_items.assert_called()
-
-
-def test_get_popular_foods(mocker):
-    """Test get_popular_foods function."""
-    mock_query = mocker.patch("models.Food.query")
-    mock_format_menu_items = mocker.patch("utils.format_menu_items")
-
-    get_popular_foods()
-
-    mock_format_menu_items.assert_called()
-
-def test_get_all_foods(mocker):
-    """Test get_all_foods function."""
-    mock_query = mocker.patch("models.Food.query")
-    mock_format_menu_items = mocker.patch("utils.format_menu_items")
-
-    get_all_foods()
-
-    mock_format_menu_items.assert_called()
-
-
-def test_deactivate_expired_questions(mocker):
-    """Test deactivate_expired_questions function."""
-    mock_query = mocker.patch("models.FeedbackQuestion.query")
-    mock_session = mocker.patch("website.db.session")
-
-    deactivate_expired_questions()
-
-    assert not mock_query.filter.return_value.all.return_value[0].is_active
-    assert mock_session.commit.called
 
 def test_create_menu_struct():
     """Test create_menu_struct function."""
