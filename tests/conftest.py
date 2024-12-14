@@ -53,7 +53,7 @@ def app():
     # Create an instance of TestConfig
     # test_config = TestConfig()
     # Create the app with the test config
-    _app = create_app(config_class=TestConfig)
+    _app = create_app(test_config=TestConfig)
     # Explicitly update the config
     _app.config.update({
         'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
