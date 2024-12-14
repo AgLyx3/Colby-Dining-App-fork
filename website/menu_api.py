@@ -2,18 +2,19 @@
 Filename:
     menu_api.py
 """
-import requests
+from collections import OrderedDict
 from datetime import datetime
 import logging
 import base64
 from typing import Dict, List, Optional
-from collections import OrderedDict
+import requests
 
 logger = logging.getLogger(__name__)
 
+
 class BonAppetitAPI:
     """Service class to interact with Bon Appetit API"""
-    
+
     BASE_URL = "https://cafemanager-api.cafebonappetit.com/api/2"
     DINING_HALLS = {
         "Dana": "1445",
@@ -47,24 +48,26 @@ class BonAppetitAPI:
     def _sort_meal_periods(self, menu_data: Dict[str, List[Dict]]) -> OrderedDict:
         """Sort meal periods in the correct order"""
         ordered_menu = OrderedDict()
-        
+
         # First add meals in our defined order
         for meal_period in self.MEAL_PERIOD_ORDER:
             if meal_period in menu_data:
                 ordered_menu[meal_period] = menu_data[meal_period]
-        
+
         # Add any additional meal periods that weren't in our predefined order
         for meal_period in menu_data:
             if meal_period not in ordered_menu:
                 ordered_menu[meal_period] = menu_data[meal_period]
-                
+
         return ordered_menu
 
-    def process_menu_data(self, menu_data: dict) -> Dict[str, List[Dict]]:
+    def process_menu_data(
+            self,
+            menu_data: dict
+    ) -> Dict[str, List[Dict]]:
         """Process raw menu data into a simplified format grouped by meal period"""
         try:
             organized_menu = {}
-            
             if not menu_data or 'days' not in menu_data or not menu_data['days']:
                 logger.warning("No valid menu data to process")
                 return organized_menu
@@ -73,10 +76,8 @@ class BonAppetitAPI:
             day = menu_data['days'][0]
             cafe_id = next(iter(day.get('cafes', {}).keys()))
             cafe_data = day['cafes'].get(cafe_id, {})
-
             # Get the icons/dietary information
             cor_icons = menu_data.get('cor_icons', {})
-            
             # Process each daypart
             for daypart_list in cafe_data.get('dayparts', []):
                 # Handle both list and dict daypart formats
@@ -89,9 +90,7 @@ class BonAppetitAPI:
                     meal_period = daypart.get('label', '')
                     if not meal_period:
                         continue
-
                     organized_menu[meal_period] = []
-
                     # Process each station
                     for station in daypart.get('stations', []):
                         station_name = station.get('label', '')
@@ -121,16 +120,13 @@ class BonAppetitAPI:
 
             # Remove empty meal periods
             organized_menu = {k: v for k, v in organized_menu.items() if v}
-            
             # Sort meal periods
             organized_menu = self._sort_meal_periods(organized_menu)
-            
-            logger.info(f"Successfully processed menu with {len(organized_menu)} meal periods")
+            logger.info("Successfully processed menu with %d meal periods", len(organized_menu))
             return organized_menu
-
         except Exception as e:
-            logger.error(f"Error processing menu: {str(e)}")
-            logger.error(f"Menu data causing error: {str(menu_data)[:200]}...")
+            logger.error("Error processing menu: %s", str(e))
+            logger.error("Menu data causing error: %s ...", str(menu_data)[:200])
             return {}
 
     def get_menu(self, cafe_id: str, date: Optional[str] = None) -> dict:
@@ -138,24 +134,22 @@ class BonAppetitAPI:
         try:
             if not date:
                 date = datetime.now().strftime('%Y-%m-%d')
-                
+
             url = f"{self.BASE_URL}/menus"
             params = {
                 'cafe': cafe_id,
                 'date': date
             }
-            
-            logger.info(f"Making request to {url} with params: {params}")
+            logger.info("Making request to %s with params: %s", url, params)
             auth = (self.username, self.password)
             response = self.session.get(url, params=params, auth=auth, timeout=10)
             response.raise_for_status()
-            
             data = response.json()
-            logger.debug(f"Received data structure: {str(data)[:200]}...")
+            logger.debug("Received data structure: %s...", str(data)[:200])
             return data
-            
+
         except Exception as e:
-            logger.error(f"Error fetching menu: {str(e)}")
+            logger.error("Error fetching menu: %s", str(e))
             return {}
 
     def get_cafe_hours(self, cafe_id: str) -> dict:
@@ -163,31 +157,31 @@ class BonAppetitAPI:
         try:
             url = f"{self.BASE_URL}/cafes"
             params = {'cafe': cafe_id}
-            
+
             response = self.session.get(url, params=params, timeout=10)
             response.raise_for_status()
-            
+
             data = response.json()
             cafe_data = data.get('cafes', {}).get(cafe_id, {})
-            
+
             today = datetime.now().strftime('%Y-%m-%d')
             operating_hours = {
                 'status': 'unknown',
                 'message': '',
                 'dayparts': []
             }
-            
+
             for day in cafe_data.get('days', []):
                 if day.get('date') == today:
                     operating_hours['status'] = day.get('status', 'unknown')
                     operating_hours['message'] = day.get('message', '')
-                    
+
                     for daypart_list in day.get('dayparts', []):
                         if isinstance(daypart_list, dict):
                             dayparts = [daypart_list]
                         else:
                             dayparts = daypart_list
-                            
+
                         for dp in dayparts:
                             operating_hours['dayparts'].append({
                                 'label': dp.get('label', ''),
@@ -195,11 +189,11 @@ class BonAppetitAPI:
                                 'endtime': dp.get('endtime', ''),
                                 'message': dp.get('message', '')
                             })
-            
+
             return operating_hours
-            
+
         except Exception as e:
-            logger.error(f"Error fetching cafe hours: {str(e)}")
+            logger.error("Error fetching cafe hours: %s", str(e))
             return {
                 'status': 'error',
                 'message': 'Unable to fetch operating hours',

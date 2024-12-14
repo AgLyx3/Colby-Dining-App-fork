@@ -260,23 +260,23 @@ if __name__ == "__main__":
     base_dir = os.path.dirname(os.path.abspath(__file__))
     try:
         # Initialize predictor with paths relative to the script location
-        predictor = DiningHallPredictor(
+        PREDICTOR = DiningHallPredictor(
             model_dir=os.path.join(base_dir, 'ml_models'),
             data_dir=os.path.join(base_dir, 'data')
         )
         # Check if we have saved models
-        if not any(predictor.models):
+        if not any(PREDICTOR.models):
             logger.info("No saved models found, training new models...")
-            df = predictor.load_data('October-*.csv')
-            predictor.train_models(df, save=True)
+            df = PREDICTOR.load_data('October-*.csv')
+            PREDICTOR.train_models(df, save=True)
         # Make predictions for all dining halls
         current_time = datetime.now()
         logger.info(f"\nGenerating predictions for {current_time.strftime('%I:%M %p')}")
         print("\n" + "=" * 50)
         print(f"Dining Hall Predictions for {current_time.strftime('%I:%M %p')}")
         print("=" * 50)
-        for hall in predictor.dining_halls:
-            prediction = predictor.predict_wait_times(current_time, hall)
+        for hall in PREDICTOR.dining_halls:
+            prediction = PREDICTOR.predict_wait_times(current_time, hall)
             print(f"\n{hall}:")
             if prediction:
                 if prediction.get('status') == 'closed':
