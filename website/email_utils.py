@@ -9,6 +9,7 @@ from datetime import datetime
 from threading import Thread
 import smtplib
 from website import db
+import os
 from .menu_api import BonAppetitAPI
 from .models import FavoriteDish, Student
 
