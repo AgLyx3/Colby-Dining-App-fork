@@ -66,6 +66,7 @@ GOOGLE_OAUTH_CLIENT_ID=your_google_client_id
 GOOGLE_OAUTH_CLIENT_SECRET=your_google_client_secret
 MENU_API_USERNAME=your_api_username
 MENU_API_PASSWORD=your_api_password
+GEMINI_API=your-api-key
 ```
 
 5. Initialize the database:
