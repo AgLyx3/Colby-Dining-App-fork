@@ -21,7 +21,6 @@ pylint
 pytest-mock
 pytest-flask
 
-
 # Specify platform-specific wheels
 --only-binary=numpy
 --only-binary=pandas
