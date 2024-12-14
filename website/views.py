@@ -768,8 +768,7 @@ def get_trending_favorites():
         ).order_by(
             db.desc('fav_count')
         ).limit(6).all()
-
-        logger.info(f"Found {len(trending)} trending items")
+        logger.info("Found %d trending items", len(trending))
 
         return jsonify({
             'status': 'success',
@@ -780,7 +779,7 @@ def get_trending_favorites():
         })
 
     except Exception as e:
-        logger.error(f"Error fetching trending favorites: {str(e)}")
+        logger.error("Error fetching trending favorites: %s", str(e))
         return jsonify({
             'status': 'error',
             'message': 'Unable to fetch trending favorites',
@@ -847,7 +846,7 @@ def get_active_feedback_questions():
         })
 
     except Exception as e:
-        logger.error(f"Error getting active questions: {str(e)}")
+        logger.error("Error getting active questions: %s", str(e))
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
