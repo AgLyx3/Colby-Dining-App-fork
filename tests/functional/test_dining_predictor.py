@@ -1,83 +1,130 @@
-"""
-Filename:
-    test_dining_predictor.py
-
-Note:
-    Testing dining predictor functionalities
-"""
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 import pandas as pd
 from datetime import datetime
 from website.dining_predictor import DiningHallPredictor
 
+
 @pytest.fixture
-def mock_data():
-    '''
-    Create mock data
-    '''
-    # Create mock data similar to the output of load_data
-    return pd.DataFrame({
-        'datetime': pd.date_range(start='2023-10-01', periods=6, freq='H'),
-        'location': ['Dana', 'Dana', 'Roberts', 'Roberts', 'Foss', 'Foss'],
-        'count': [5, 10, 15, 20, 25, 30],
-        'hour': [12, 13, 14, 15, 16, 17],
-        'minute': [0, 0, 0, 0, 0, 0],
-        'day_of_week': [0, 0, 0, 0, 0, 0],
-        'is_weekend': [False, False, False, False, False, False],
-        'time_of_day': [12.0, 13.0, 14.0, 15.0, 16.0, 17.0],
-        'is_peak_hour': [False, False, False, False, False, False],
+def mock_dining_predictor(mocker):
+    """
+    Fixture to mock the DiningHallPredictor class and its methods.
+    """
+    # Mock the load_data method to return a sample DataFrame
+    mock_load_data = mocker.patch('website.dining_predictor.DiningHallPredictor.load_data')
+    mock_load_data.return_value = pd.DataFrame({
+        'datetime': pd.to_datetime(['2024-12-14 08:00', '2024-12-14 12:00', '2024-12-14 18:00']),
+        'location': ['Dana', 'Roberts', 'Foss'],
+        'count': [100, 200, 150]
     })
 
-def test_load_data(mock_data):
-    '''
-    test load data
-    '''
-    predictor = DiningHallPredictor(model_dir='test_models', data_dir='test_data')
-    
-    # Mock the load_data method to return mock data
-    with patch.object(predictor, 'load_data', return_value=mock_data):
-        data = predictor.load_data()
-    
-    assert data.shape == (6, 9)  # Check if the shape of the data is correct
-    assert data['location'].iloc[0] == 'Dana'  # Check if the location is correct
+    # Mock the train_models method to do nothing
+    mock_train_models = mocker.patch('website.dining_predictor.DiningHallPredictor.train_models')
+    mock_train_models.return_value = None
 
-def test_train_models(mock_data):
-    '''
-    test train model
-    '''
-    predictor = DiningHallPredictor(model_dir='test_models', data_dir='test_data')
-    
-    # Mock the save_models method to avoid actual saving
-    with patch.object(predictor, 'save_models') as mock_save:
-        predictor.train_models(mock_data)
-    
-    assert 'Dana' in predictor.models  # Ensure the model for Dana is trained
-    assert 'Roberts' in predictor.models  # Ensure the model for Roberts is trained
+    # Mock the joblib load method to return a dummy model and scaler
+    mock_load = mocker.patch('website.dining_predictor.joblib.load')
+    mock_load.return_value = MagicMock()
 
-def test_predict_wait_times(mock_data):
-    '''
-    test predict wait time
-    '''
-    predictor = DiningHallPredictor(model_dir='test_models', data_dir='test_data')
+    # Mock the joblib dump method to do nothing
+    mock_dump = mocker.patch('website.dining_predictor.joblib.dump')
+    mock_dump.return_value = None
+
+    # Mock the load_saved_models method to populate models and scalers
+    mock_load_saved_models = mocker.patch('website.dining_predictor.DiningHallPredictor.load_saved_models')
+    mock_load_saved_models.return_value = None
+
+    # Initialize the predictor
+    predictor = DiningHallPredictor(model_dir='ml_models', data_dir='data')
+    predictor.models = {'Dana': MagicMock(), 'Roberts': MagicMock(), 'Foss': MagicMock()}  # mock models
+    predictor.scalers = {'Dana': MagicMock(), 'Roberts': MagicMock(), 'Foss': MagicMock()}  # mock scalers
     
-    # Mock trained models and scalers
-    with patch.object(predictor, 'load_saved_models'):
-        predictor.models = {'Dana': MagicMock(), 'Roberts': MagicMock()}
-        predictor.scalers = {'Dana': MagicMock(), 'Roberts': MagicMock()}
-    
-    # Simulate model prediction
-    with patch.object(predictor, 'predict_wait_times', return_value={
-        'predicted_count': 50,
+    return predictor, mock_load_data, mock_train_models, mock_load, mock_dump, mock_load_saved_models
+
+def test_predict_wait_times(mocker, mock_dining_predictor):
+    """
+    Test the predict_wait_times function.
+    """
+    predictor, _, _, _, _, _ = mock_dining_predictor
+
+    # Mock the result of predict_wait_times
+    mocker.patch.object(predictor, 'predict_wait_times', return_value={
+        'predicted_count': 120,
         'wait_time_minutes': 10,
-        'swipes_per_minute': 3.33,
-        'busyness_level': 'High',
+        'swipes_per_minute': 0.8,
+        'busyness_level': 'Medium',
         'status': 'success'
-    }) as mock_predict:
-        current_time = datetime.now()
-        prediction = predictor.predict_wait_times(current_time, 'Dana')
+    })
     
-    assert prediction['predicted_count'] == 50  # Check if predicted count is correct
-    assert prediction['wait_time_minutes'] == 10  # Check if wait time is correct
-    assert prediction['busyness_level'] == 'High'  # Check if busyness level is correct
-    assert prediction['status'] == 'success'  # Check if status is success
+    current_time = datetime(2024, 12, 14, 12, 0)  # Mock current time to 12:00 PM
+    prediction = predictor.predict_wait_times(current_time, 'Dana')
+
+    # Assertions for the return value of predict_wait_times
+    assert prediction['predicted_count'] == 120
+    assert prediction['wait_time_minutes'] == 10
+    assert prediction['swipes_per_minute'] == 0.8
+    assert prediction['busyness_level'] == 'Medium'
+    assert prediction['status'] == 'success'
+
+
+def test_save_models(mock_dining_predictor):
+    """
+    Test saving models and scalers.
+    """
+    predictor, _, _, _, mock_dump, _ = mock_dining_predictor
+    predictor.save_models()
+
+    # Ensure that joblib.dump is called for each dining hall model and scaler
+    for hall in predictor.dining_halls:
+        # Check if dump was called for both model and scaler
+        mock_dump.assert_any_call(f"ml_models/{hall.lower()}_model.joblib", predictor.models[hall])
+        mock_dump.assert_any_call(f"ml_models/{hall.lower()}_scaler.joblib", predictor.scalers[hall])
+
+
+def test_save_models(mock_dining_predictor):
+    """
+    Test saving models and scalers.
+    """
+    predictor, _, _, _, mock_dump, _ = mock_dining_predictor
+    predictor.save_models()
+
+    # Ensure that joblib.dump is called for each dining hall model and scaler
+    for hall in predictor.dining_halls:
+        mock_dump.assert_any_call(f"ml_models/{hall.lower()}_model.joblib", predictor.models[hall])
+        mock_dump.assert_any_call(f"ml_models/{hall.lower()}_scaler.joblib", predictor.scalers[hall])
+
+
+def test_prepare_features(mock_dining_predictor):
+    """
+    Test if the feature preparation function works as expected.
+    """
+    predictor, _, _, _, _, _ = mock_dining_predictor
+
+    # Sample data frame to pass into prepare_features
+    data = pd.DataFrame({
+        'count': [100, 150, 200],
+        'hour': [8, 12, 18],
+        'minute': [0, 30, 0],
+        'day_of_week': [0, 1, 2],
+        'is_weekend': [False, False, False],
+        'time_of_day': [8, 12.5, 18],
+        'is_peak_hour': [True, True, True]
+    })
+    
+    features = predictor.prepare_features(data)
+
+    # Assertions for the shape of the features dataframe and specific feature columns
+    assert features.shape[0] == 3  # 3 rows
+    assert 'rolling_mean' in features.columns
+    assert 'rolling_std' in features.columns
+
+
+def test_invalid_dining_hall(mock_dining_predictor):
+    """
+    Test if invalid dining hall location raises an error in predict_wait_times.
+    """
+    predictor, _, _, _, _, _ = mock_dining_predictor
+    result = predictor.predict_wait_times(datetime(2024, 12, 14, 12, 0), 'InvalidHall')
+
+    # Assert that the result for an invalid hall is None
+    assert result is None
