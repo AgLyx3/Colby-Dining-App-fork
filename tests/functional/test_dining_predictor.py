@@ -67,19 +67,6 @@ def test_predict_wait_times(mocker, mock_dining_predictor):
     assert prediction['status'] == 'success'
 
 
-def test_save_models(mock_dining_predictor):
-    """
-    Test saving models and scalers.
-    """
-    predictor, _, _, _, mock_dump, _ = mock_dining_predictor
-    predictor.save_models()
-
-    # Ensure that joblib.dump is called for each dining hall model and scaler
-    for hall in predictor.dining_halls:
-        # Check if dump was called for both model and scaler
-        mock_dump.assert_any_call(f"ml_models/{hall.lower()}_model.joblib", predictor.models[hall])
-        mock_dump.assert_any_call(f"ml_models/{hall.lower()}_scaler.joblib", predictor.scalers[hall])
-
 
 def test_save_models(mock_dining_predictor):
     """
