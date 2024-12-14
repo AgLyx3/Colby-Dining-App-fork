@@ -1,7 +1,8 @@
-from website import create_app
-from website.models import db, WaitTime, Food, Tag, FeedbackQuestion, Response
+from website import create_app, db
+from .models import WaitTime, Food, Tag, FeedbackQuestion, Response
 from datetime import datetime, time, timedelta
 import random
+
 
 app = create_app()
 def generate_wait_times():

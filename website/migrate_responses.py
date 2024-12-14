@@ -1,5 +1,5 @@
 from website import create_app, db
-from website.models import Response
+from .models import Response
 from sqlalchemy import text
 
 def update_responses_table():
