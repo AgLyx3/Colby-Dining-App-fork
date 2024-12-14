@@ -2,6 +2,7 @@
 Filename:
     email_utils.py
 """
+import os
 import logging
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -9,7 +10,6 @@ from datetime import datetime
 from threading import Thread
 import smtplib
 from website import db
-import os
 from .menu_api import BonAppetitAPI
 from .models import FavoriteDish, Student
 
@@ -20,7 +20,6 @@ class EmailSender:
         self.smtp_port = 587
         self.sender_email = os.getenv('EMAIL_USERNAME')
         self.sender_password = os.getenv('EMAIL_PASSWORD')
-        
     def send_feedback_email(self, name, email, feedback_type, message):
         """send feedback email"""
         try:
@@ -40,21 +39,21 @@ class EmailSender:
             {message}
             """
             msg.attach(MIMEText(body, 'plain'))
-            
             with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
                 server.starttls()
                 server.login(self.sender_email, self.sender_password)
                 server.send_message(msg)
-                
             return True
-            
         except Exception as e:
             print("Error sending email: %s", str(e))
             return False
-        
     def send_favorite_dish_notification(self, student_email, dishes):
+        """
+        Send notification for favorite dishes
+        """
         try:
-            msg = MIMEMultipart('alternative')  # Use alternative to support both plain text and HTML
+            msg = MIMEMultipart('alternative')
+# Use alternative to support both plain text and HTML
             msg['From'] = self.sender_email
             msg['To'] = student_email
             msg['Subject'] = "Your Favorite Dishes are Available Today at Colby Dining!"
@@ -72,7 +71,6 @@ class EmailSender:
             Best regards,
             Colby Dining Team
             """
-                    
             html_content = f"""
             <html>
                 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -91,7 +89,6 @@ class EmailSender:
                 </body>
             </html>
             """
-            
             # Attach both versions
             part1 = MIMEText(text_content, 'plain')
             part2 = MIMEText(html_content, 'html')
@@ -120,15 +117,12 @@ class EmailSender:
             try:
                 logger = logging.getLogger(__name__)
                 logger.info("Starting favorite dishes check...")
-                
                 menu_service = BonAppetitAPI(
                     username=app.config['MENU_API_USERNAME'],
                     password=app.config['MENU_API_PASSWORD']
                 )
-                
                 email_sender = EmailSender()
-                
-                # Get all available dishes for today
+# Get all available dishes for today
                 all_dishes = set()
                 for hall_id in menu_service.DINING_HALLS.values():
                     try:
@@ -142,15 +136,12 @@ class EmailSender:
                     except Exception as e:
                         logger.error("Error fetching menu for hall %d : %s", hall_id, str(e))
                         continue
-                
                 # Get all favorite dishes
                 favorites = db.session.query(FavoriteDish)\
                     .join(Student)\
                     .filter(Student.student_email.isnot(None))\
                     .all()
-                
                 logger.info("Found %d favorite dishes in database",len(favorites))
-                
                 # Group notifications by student
                 notifications = {}
                 for favorite in favorites:
@@ -158,16 +149,14 @@ class EmailSender:
                         if favorite.student_email not in notifications:
                             notifications[favorite.student_email] = []
                         notifications[favorite.student_email].append(favorite.dish_name)
-                
                 logger.info("Sending notifications to %d students", len(notifications))
-                
                 # Send notifications
                 for student_email, dishes in notifications.items():
                     try:
-                        logger.info("Sending notification to %s about %d dishes", student_email, len(dishes))
+                        logger.info("Sending notification to %s about %d dishes",
+student_email, len(dishes))
                         email_sender.send_async_notification(student_email, dishes)
                     except Exception as e:
                         logger.error("Error sending notification to %s: %s", student_email, str(e))
-                        
             except Exception as e:
                 logger.error("Error in check_favorite_dishes: %s", str(e))

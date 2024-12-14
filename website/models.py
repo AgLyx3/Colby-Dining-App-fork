@@ -9,6 +9,7 @@ from flask_login import UserMixin
 from website import db
 
 class Student(db.Model, UserMixin):
+    """Class name: Student"""
     student_email = db.Column(db.String(255), primary_key=True)
     student_access_token = db.Column(db.String(255), unique=True, nullable=False)
     fav = db.relationship('Favorites', backref='student')
@@ -24,8 +25,8 @@ class Student(db.Model, UserMixin):
 
     def is_anonymous(self):
         return False
-    
-    
+
+
 # Association table for the many-to-many relationship between Food and Tag
 food_tags = db.Table('food_tags',
     db.Column('food_id', db.Integer, db.ForeignKey('food.id'), primary_key=True),
@@ -33,12 +34,16 @@ food_tags = db.Table('food_tags',
 )
 
 class Tag(db.Model):
+    """Class name: Tag"""
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), unique=True, nullable=False)  # e.g., 'Lunch', 'Vegetarian', 'Main Dining Hall'
-    type = db.Column(db.String(50), nullable=False)  # e.g., 'Meal', 'Diet', 'Location'
+    name = db.Column(db.String(255), unique=True, nullable=False)
+# e.g., 'Lunch', 'Vegetarian', 'Main Dining Hall'
+    type = db.Column(db.String(50), nullable=False)
+# e.g., 'Meal', 'Diet', 'Location'
 
 
 class Food(db.Model):
+    """Class name: Food"""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
@@ -53,22 +58,27 @@ class Food(db.Model):
 
 
 class Favorites(db.Model):
+    """Class name: Favorites"""
     id = db.Column(db.Integer, primary_key = True)
     created_at = db.Column(db.Date, nullable = False)
     update_at = db.Column(db.Date, nullable = False)
-    student_email = db.Column(db.String(255), db.ForeignKey('student.student_email'), nullable = False)
+    student_email = db.Column(db.String(255),
+db.ForeignKey('student.student_email'), nullable = False)
     food_id = db.Column(db.Integer, db.ForeignKey('food.id'), nullable = False)
 
 class FavoriteDish(db.Model):
+    """Class name: FavoriteDish"""
     id = db.Column(db.Integer, primary_key=True)
-    student_email = db.Column(db.String(255), db.ForeignKey('student.student_email'), nullable=False)
-    dish_name = db.Column(db.String(255), nullable=False)  # We'll use dish name as unique identifier
+    student_email = db.Column(db.String(255),
+db.ForeignKey('student.student_email'), nullable=False)
+    dish_name = db.Column(db.String(255), nullable=False)
+    # We'll use dish name as unique identifier
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
     # Composite unique constraint to prevent duplicate favorites
     __table_args__ = (db.UniqueConstraint('student_email', 'dish_name'),)
 
 class Administrator(db.Model, UserMixin):
+    """Class name: Administrator"""
     admin_email = db.Column(db.String(255), primary_key=True)
     password_hashed = db.Column(db.String(128), nullable=False)
     google_id = db.Column(db.String(255), unique=True)  # For OAuth
@@ -78,7 +88,6 @@ class Administrator(db.Model, UserMixin):
     picture = db.Column(db.String(255))  # Google profile picture URL
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
-    
     # Relationship with FeedbackQuestion
     feedback_questions = db.relationship(
         'FeedbackQuestion', 
@@ -95,33 +104,39 @@ class Administrator(db.Model, UserMixin):
         return f'<Administrator {self.admin_email}>'
 
 class FeedbackQuestion(db.Model):
+    """Class name: FeedbackQuestion"""
     id = db.Column(db.Integer, primary_key=True)
     question_text = db.Column(db.Text, nullable=False)
     question_type = db.Column(db.String(50), nullable=False)
     active_start_date = db.Column(db.Date, nullable=False)
     active_end_date = db.Column(db.Date, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False,
+    default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
-    administrator_id = db.Column(db.String(255), db.ForeignKey('administrator.admin_email'), nullable=False)
+    administrator_id = db.Column(db.String(255),
+db.ForeignKey('administrator.admin_email'), nullable=False)
 
     # Relationship with Response (one-to-many)
     responses = db.relationship(
         'Response', 
-        backref='feedback_question', 
-        cascade='all, delete-orphan', 
-        lazy='dynamic'
+        backref='feedback_question',
+cascade='all, delete-orphan',
+lazy='dynamic'
     )
 
 
 class Response(db.Model):
+    """Class name: Response"""
     id = db.Column(db.Integer, primary_key = True)
     content = db.Column(db.Text, nullable = False)
     question_id = db.Column(db.Integer, db.ForeignKey('feedback_question.id'), nullable=False)
-    student_email = db.Column(db.String(255), db.ForeignKey('student.student_email'), nullable=False)
+    student_email = db.Column(db.String(255),
+db.ForeignKey('student.student_email'), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 class WaitTime(db.Model):
+    """Class name: WaitTime"""
     id = db.Column(db.Integer, primary_key = True)
     location = db.Column(db.String(255), nullable = False)
     num_swipes = db.Column(db.Integer)
@@ -132,12 +147,11 @@ class WaitTime(db.Model):
     predicted_wait = db.Column(db.Integer, nullable = False)
 
 class SurveyLink(db.Model):
+    """Class name: SurveyLink"""
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     url = db.Column(db.String(500), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    admin_email = db.Column(db.String(255), db.ForeignKey('administrator.admin_email'), nullable=False)
-
-
-
+    admin_email = db.Column(db.String(255),
+db.ForeignKey('administrator.admin_email'), nullable=False)
