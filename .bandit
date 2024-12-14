@@ -1,0 +1,81 @@
+# Configuration file
+
+# Exclude test files and virtual environment
+exclude_dirs: ['tests', 'venv', 'env', '__pycache__']
+
+# See https://bandit.readthedocs.io/en/latest/plugins/index.html for all tests
+tests: ['B101',  # Use of assert detected
+        'B102',  # Use of exec detected
+        'B103',  # Use of unsafe temp file creation
+        'B104',  # Possible binding to all interfaces
+        'B105',  # Use of hard-coded password strings
+        'B106',  # Use of hard-coded password function arguments
+        'B107',  # Use of hard-coded password default values
+        'B108',  # Use of unsafe yaml load
+        'B110',  # Try, Except, Pass detected
+        'B112',  # Use of try, except, continue detected
+        'B201',  # Flask app appears to be run with debug=True
+        'B301',  # Use of pickle and modules that wrap it
+        'B302',  # Use of marshal or modules that wrap it
+        'B303',  # Use of insecure MD2, MD4, MD5, or SHA1 hash functions
+        'B304',  # Use of insecure cipher or cipher mode
+        'B305',  # Use of insecure cipher mode
+        'B306',  # Use of insecure and deprecated function
+        'B307',  # Use of eval
+        'B308',  # Use of mark_safe
+        'B309',  # Use of httpsconnection on older versions of Python
+        'B310',  # Use of urllib.urlopen
+        'B311',  # Use of random
+        'B312',  # Use of telnetlib
+        'B313',  # Use of urllib.request.urlopen
+        'B314',  # Use of xml.etree.ElementTree
+        'B315',  # Use of xml.sax
+        'B316',  # Use of xml.expat
+        'B317',  # Use of xml.dom
+        'B318',  # Use of xml.dom.expatbuilder
+        'B319',  # Use of xml.dom.minidom
+        'B320',  # Use of xml.dom.pulldom
+        'B321',  # Use of ftplib
+        'B323',  # Use of unverified context in SSL/TLS
+        'B324',  # Use of os.tempnam
+        'B325',  # Use of os.tmpnam
+        'B401',  # Import of telnetlib
+        'B402',  # Import of ftplib
+        'B403',  # Import of pickle
+        'B404',  # Import of subprocess module
+        'B405',  # Import of xml.etree
+        'B406',  # Import of xml.sax
+        'B407',  # Import of xml.expat
+        'B408',  # Import of xml.dom
+        'B409',  # Import of xml.dom.expatbuilder
+        'B410',  # Import of xml.dom.minidom
+        'B411',  # Import of xml.dom.pulldom
+        'B412',  # Import of xmlrpclib
+        'B413',  # Import of pycrypto
+        'B501',  # Request with no cert validation
+        'B502',  # SSL with bad version
+        'B503',  # SSL with bad defaults
+        'B504',  # SSL with no version
+        'B505',  # Use of weak cryptographic key
+        'B506',  # Use of yaml.load
+        'B507',  # Use of ssh_no_host_key_verify
+        'B601',  # Use of paramiko with policy set to auto
+        'B602',  # Use of subprocess with shell=True
+        'B603',  # Use of subprocess without security controls
+        'B604',  # Use of any function with shell=True
+        'B605',  # Use of start process with a shell
+        'B606',  # Use of shell equals true
+        'B607',  # Start process with partial path
+        'B608',  # Possible SQL injection
+        'B609',  # Use of wildcard injection
+        'B610',  # Django extra used with user input
+        'B611',  # Use of xmlsec with dangerous settings
+        'B701',  # Use of jinja2 without autoescaping
+        'B702',  # Use of mako templates with unsafe defaults
+        'B703'   # Use of django mark_safe
+]
+
+# Specify which tests to skip
+skips: ['B101',  # Skip assert statements
+        'B311'   # Skip random number generator warnings
+]
