@@ -1,6 +1,12 @@
+"""
+Filename:
+    menu_routes.py
+"""
 from flask import Blueprint, jsonify, request, current_app
 from datetime import datetime
 import logging
+import os
+from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
 menu_bp = Blueprint('menu', __name__)
@@ -8,9 +14,14 @@ menu_bp = Blueprint('menu', __name__)
 def get_menu_service():
     """Get menu service instance with credentials"""
     from .menu_api import BonAppetitAPI
+    username = os.getenv('MENU_API_USERNAME')
+    password = os.getenv('MENU_API_PASSWORD')
+    if not username or not password:
+        raise ValueError("Menu API credentials not found in environment variables")
+    
     return BonAppetitAPI(
-        username='colbycollege',  # Hardcoded for now
-        password='G5YTx1652Xr2ZdaPST+a'  # Hardcoded for now
+        username= username,  
+        password= password  
     )
 
 @menu_bp.route('/current')

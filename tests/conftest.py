@@ -1,5 +1,11 @@
+"""
+Filename:
+    conftest.py
+
+Note:
+    Define fixtures and set up the testing database
+"""
 import pytest
-import os
 from website import create_app
 from website.models import db as _db
 from website.models import FeedbackQuestion, Response
@@ -13,17 +19,17 @@ class TestConfig(dict):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED = False
-    
+
     # Mock Google OAuth settings
     GOOGLE_OAUTH_CLIENT_ID = 'test-client-id'
     GOOGLE_OAUTH_CLIENT_SECRET = 'test-client-secret'
     OAUTHLIB_RELAX_TOKEN_SCOPE = True
     OAUTHLIB_INSECURE_TRANSPORT = True
-    
+
     # Mock API credentials
     MENU_API_USERNAME = 'test-api-user'
     MENU_API_PASSWORD = 'test-api-pass'
-    
+
     # Other settings
     SERVER_NAME = 'localhost'
     CACHE_DIR = 'tests/test_cache'
@@ -36,19 +42,18 @@ class TestConfig(dict):
 
     def __getitem__(self, key):
         return getattr(self, key)
-    
+
     def get(self, key, default=None):
         return getattr(self, key, default)
+
 
 @pytest.fixture(scope='session')
 def app():
     """Create application for the tests."""
     # Create an instance of TestConfig
-    test_config = TestConfig()
-    
+    # test_config = TestConfig()
     # Create the app with the test config
-    _app = create_app()  # First create without config
-    
+    _app = create_app()
     # Explicitly update the config
     _app.config.update({
         'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
@@ -65,21 +70,19 @@ def app():
         'PREFERRED_URL_SCHEME': 'http',
         'SQLALCHEMY_TRACK_MODIFICATIONS': False,
     })
-    
+
     # Setup app context
     ctx = _app.app_context()
     ctx.push()
-
     # Initialize and create database
     _db.init_app(_app)
     _db.create_all()
-    
     yield _app
-    
     # Cleanup
     _db.session.remove()
     _db.drop_all()
     ctx.pop()
+
 
 @pytest.fixture
 def db(app):
@@ -88,15 +91,18 @@ def db(app):
     _db.create_all()
     return _db
 
-@pytest.fixture
-def client(app):
-    """Create a test client for the app."""
-    return app.test_client()
 
 @pytest.fixture
-def runner(app):
+def client(app2):
+    """Create a test client for the app."""
+    return app2.test_client()
+
+
+@pytest.fixture
+def runner(app3):
     """Create a test runner for the app's Click commands."""
-    return app.test_cli_runner()
+    return app3.test_cli_runner()
+
 
 @pytest.fixture
 def auth_client(client):
@@ -109,16 +115,15 @@ def auth_client(client):
         }
     return client
 
+
 @pytest.fixture
-def admin_client(client):
+def admin_client(newClient):
     """Create an admin test client."""
-    with client.session_transaction() as session:
+    with newClient.session_transaction() as session:
         session['google_oauth_token'] = {'access_token': 'fake-token'}
         session['user_info'] = {
             'email': 'admin@colby.edu',
             'name': 'Admin User'
         }
         session['is_admin'] = True
-    return client
-
-
+    return newClient

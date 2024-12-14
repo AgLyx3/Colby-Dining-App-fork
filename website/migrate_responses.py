@@ -1,3 +1,7 @@
+"""
+Filename:
+    migrate_responses.py
+"""
 from website import create_app, db
 from .models import Response
 from sqlalchemy import text
@@ -8,7 +12,8 @@ def update_responses_table():
         try:
             # Add student_email column using modern SQLAlchemy syntax
             with db.engine.connect() as conn:
-                conn.execute(text('''
+                conn.execute(text(
+                '''
                     ALTER TABLE response 
                     ADD COLUMN student_email VARCHAR(255) REFERENCES student(student_email)
                 '''))
