@@ -6,6 +6,7 @@ import os
 import logging
 import sys
 from flask import Flask
+from flask_login import LoginManager
 from dotenv import load_dotenv
 from website.scheduler import SchedulerService
 from website.models import db
