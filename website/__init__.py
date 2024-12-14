@@ -71,7 +71,7 @@ def create_app(test_config=None):
         init_admin_model()
         logger.info("Core services initialized successfully")
     except Exception as e:
-        logger.error(f"Initialization error: {e}")
+        logger.error("Initialization error: %s", str(e))
         raise
 
     with app.app_context():
@@ -80,7 +80,7 @@ def create_app(test_config=None):
             create_tags()  # Assuming this function creates necessary initial data
             logger.info("Database initialized successfully")
         except Exception as e:
-            logger.error(f"Startup error: {e}")
+            logger.error("Startup error: %s", str(e))
 
     # Register blueprints
     app.register_blueprint(auth_bp)
