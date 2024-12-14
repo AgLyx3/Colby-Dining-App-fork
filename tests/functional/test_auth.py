@@ -5,7 +5,10 @@ Filename:
 Note:
     Testing auth blueprint
 """
-
+import pytest
+from flask import url_for, session
+from flask_dance.consumer.storage import MemoryStorage
+from website.models import Student
 
 class TestGoogleAuthentication:
     def test_login_redirect_to_google(self, client):

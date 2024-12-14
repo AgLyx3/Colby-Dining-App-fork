@@ -5,7 +5,11 @@ Filename:
 Note:
     Testing views
 """
-
+import pytest
+from website import create_app
+from flask_login import current_user
+from website.models import Student, Food, Tag, Favorites, FeedbackQuestion, Administrator
+from website.views import menu_bp
 
 def test_index(client):
     """
