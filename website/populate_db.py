@@ -1,7 +1,11 @@
-from website import create_app, db
-from .models import WaitTime, Food, Tag, FeedbackQuestion, Response
+"""
+Filename:
+    populate_db.py
+"""
 from datetime import datetime, time, timedelta
 import random
+from website import create_app, db
+from .models import WaitTime, Food, Tag, FeedbackQuestion, Response
 
 
 app = create_app()

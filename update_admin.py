@@ -1,12 +1,30 @@
-from website import create_app, db
-from website.models import Administrator
-from werkzeug.security import generate_password_hash
-from datetime import datetime
+"""
+Filename:
+    update_admin.py
+
+Usage:
+    if adding a new admin:
+        python3 update_admin --add [full email address]
+
+    if removing an existing admin:
+        python3 update_admin --remove [full email address]
+
+Note:
+    Add/Remove the admin from the database
+    Current version omits the admin password while removing an admin
+"""
 import sys
 import argparse
+from datetime import datetime
+from werkzeug.security import generate_password_hash
+from website import create_app, db
+from website.models import Administrator
 
 
 def add_admin(email, password):
+    """
+    Adding admin
+    """
     app = create_app()
     with app.app_context():
         try:
@@ -29,6 +47,9 @@ def add_admin(email, password):
 
 
 def remove_admin(email):
+    """
+    Removing admin
+    """
     app = create_app()
     with app.app_context():
         try:
@@ -62,23 +83,22 @@ def validate_email(email):
 
 
 def main():
+    """
+    main function for terminal line arguments
+    """
     # Create argument parser
     parser = argparse.ArgumentParser(description="Manage administrator users")
 
     # Create mutually exclusive group to ensure only one action is performed
     group = parser.add_mutually_exclusive_group(required=True)
-
     # Add admin argument
     group.add_argument('--add', nargs=1, metavar=('EMAIL'),
                        type=str, help='Add a new admin (email password)')
-
     # Remove admin argument
     group.add_argument('--remove', type=validate_email,
                        help='Remove an existing admin (email)')
-
     # Parse arguments
     args = parser.parse_args()
-
     # Handle remove admin action
     if args.remove:
         confirmation = input(f"Are you sure you want to remove admin {args.remove}? (y/n): ")

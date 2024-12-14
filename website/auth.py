@@ -1,3 +1,7 @@
+"""
+Filename:
+    auth.py
+"""
 from flask import Blueprint, redirect, url_for, flash, session
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_login import LoginManager, login_user, logout_user, current_user

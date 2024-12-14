@@ -1,13 +1,18 @@
-from flask import Flask
-from flask_login import LoginManager
-from dotenv import load_dotenv
+"""
+Filename:
+    __init__.py
+"""
 import os
 import logging
 import sys
+from flask import Flask
+from flask_login import LoginManager
+from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 
 
 db = SQLAlchemy()
+
 
 def create_app(test_config=None):
    # Load environment variables
@@ -52,10 +57,11 @@ def create_app(test_config=None):
        #     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
        #     logger.info("Using JawsDB URL for database connection")
        # else:
-        #    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
-        #    logger.info("Using default database URL")
-   else:
-       app.config.update(test_config)
+       #    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+       #    logger.info("Using default database URL")
+       
+    else:
+        app.config.update(test_config)
 
    # Initialize extensions
    try:
@@ -75,13 +81,13 @@ def create_app(test_config=None):
         except Exception as e:
             logger.error(f"Startup error: {e}")
 
-   # Register blueprints
-   app.register_blueprint(auth_bp)
-   app.register_blueprint(google_bp, url_prefix="/login")
-   app.register_blueprint(main_blueprint)
-   app.register_blueprint(menu_bp, url_prefix='/api/menu')
+    # Register blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(google_bp, url_prefix="/login")
+    app.register_blueprint(main_blueprint)
+    app.register_blueprint(menu_bp, url_prefix='/api/menu')
 
-   app.config.update({
+    app.config.update({
         'MENU_API_USERNAME': os.getenv('MENU_API_USERNAME'),
         'MENU_API_PASSWORD': os.getenv('MENU_API_PASSWORD')
     })
@@ -89,7 +95,4 @@ def create_app(test_config=None):
 
 
 
-   return app
-
-
-
+    return app

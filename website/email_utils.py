@@ -1,3 +1,7 @@
+"""
+Filename:
+    email_utils.py
+"""
 import logging
 from website import db
 import smtplib
@@ -29,7 +33,7 @@ class EmailSender:
             Email: {email}
             Type: {feedback_type}
             Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-            
+  
             Message:
             {message}
             """
