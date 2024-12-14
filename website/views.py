@@ -8,16 +8,16 @@ from sqlite3 import IntegrityError
 from datetime import datetime, timedelta
 from sqlalchemy import cast, Date, and_, exists
 from flask import current_app
-from .models import Food, Tag, food_tags, Response
-from .utils import filter_foods, get_all_foods
 from flask import Blueprint, render_template, jsonify, request, redirect, session, url_for
 from flask_login import current_user, login_required
 from .auth import admin_required
 from .dining_predictor import DiningHallPredictor
+from .models import Tag, Response
 from .models import FeedbackQuestion, Administrator, FavoriteDish, SurveyLink
 from .email_utils import EmailSender
 from .menu_api import BonAppetitAPI
 from website import db
+from .utils import filter_foods, get_all_foods
 from .utils import deactivate_expired_questions
 # import google.generativeai as genai
 # from typing import Dict, List, Optional
