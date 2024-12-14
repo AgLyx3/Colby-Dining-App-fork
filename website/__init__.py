@@ -62,7 +62,7 @@ def create_app(test_config=None):
         #    logger.info("Using default database URL")
 
     else:
-        app.config.update(test_config)
+        app.config.update(vars(test_config))
 
     # Initialize extensions
     try:
