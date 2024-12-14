@@ -1,5 +1,5 @@
 from website import create_app, db
-from website.models import Administrator
+from .models import Administrator
 import traceback
 
 def update_database():

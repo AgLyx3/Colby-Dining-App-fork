@@ -1,21 +1,20 @@
 from flask import Flask
-from website.scheduler import SchedulerService
-from website.models import db
 from flask_login import LoginManager
-from website.views import main_blueprint
-from website.menu_routes import menu_bp
-from website.utils import create_tags
-from website.auth import auth_bp, google_bp, login_manager, init_admin_model
 from dotenv import load_dotenv
 import os
 import logging
 import sys
-y = SchedulerService()
+from flask_sqlalchemy import SQLAlchemy
+
+
+db = SQLAlchemy()
 
 def create_app(test_config=None):
    # Load environment variables
    load_dotenv()
    
+   from .scheduler import SchedulerService
+   y = SchedulerService()
    # Initialize Flask app
    app = Flask(__name__, static_folder='static')
    with app.app_context():
@@ -25,6 +24,11 @@ def create_app(test_config=None):
    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
    logger = logging.getLogger(__name__)
    logger.info("Starting application initialization...")
+
+   from .views import main_blueprint
+   from .menu_routes import menu_bp
+   from .utils import create_tags
+   from .auth import auth_bp, google_bp, login_manager, init_admin_model
 
    # Load configurations
    if test_config is None:
@@ -62,6 +66,14 @@ def create_app(test_config=None):
    except Exception as e:
        logger.error(f"Initialization error: {e}")
        raise
+   
+   with app.app_context():
+        try:
+            db.create_all()  # Create the database tables
+            create_tags()  # Assuming this function creates necessary initial data
+            logger.info("Database initialized successfully")
+        except Exception as e:
+            logger.error(f"Startup error: {e}")
 
    # Register blueprints
    app.register_blueprint(auth_bp)
@@ -73,20 +85,11 @@ def create_app(test_config=None):
         'MENU_API_USERNAME': os.getenv('MENU_API_USERNAME'),
         'MENU_API_PASSWORD': os.getenv('MENU_API_PASSWORD')
     })
+   
+
+
 
    return app
 
-if __name__ == '__main__':
-    app = create_app()
-    with app.app_context():
-        try:
-            db.create_all()
-            create_tags()
-            # Get logger instance
-            logger = logging.getLogger(__name__)
-            logger.info("Database initialized successfully")
-            app.run(debug=os.getenv('FLASK_ENV') == 'development', port=8000)
-        except Exception as e:
-            # Get logger instance
-            logger = logging.getLogger(__name__)
-            logger.error(f"Startup error: {e}")
+
+

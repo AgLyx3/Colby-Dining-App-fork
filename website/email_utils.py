@@ -1,12 +1,12 @@
 import logging
-from website.models import db
+from website import db
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 from threading import Thread
-from website.menu_api import BonAppetitAPI
-from website.models import FavoriteDish, Student
+from .menu_api import BonAppetitAPI
+from .models import FavoriteDish, Student
 
 class EmailSender:
     def __init__(self):
