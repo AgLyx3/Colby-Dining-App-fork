@@ -93,9 +93,9 @@ def db(app):
 
 
 @pytest.fixture
-def client(app2):
+def client(app):
     """Create a test client for the app."""
-    return app2.test_client()
+    return app.test_client()
 
 
 @pytest.fixture
