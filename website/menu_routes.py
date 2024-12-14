@@ -11,7 +11,7 @@ menu_bp = Blueprint('menu', __name__)
 
 def get_menu_service():
     """Get menu service instance with credentials"""
-    from menu_api import BonAppetitAPI
+    from .menu_api import BonAppetitAPI
     return BonAppetitAPI(
         username='colbycollege',  # Hardcoded for now
         password='G5YTx1652Xr2ZdaPST+a'  # Hardcoded for now

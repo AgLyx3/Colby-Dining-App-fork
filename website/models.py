@@ -6,9 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-
-
-db = SQLAlchemy()
+from website import db
 
 class Student(db.Model, UserMixin):
     student_email = db.Column(db.String(255), primary_key=True)

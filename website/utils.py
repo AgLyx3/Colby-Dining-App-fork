@@ -2,8 +2,12 @@
 Filename:
     utils.py
 """
+from .models import Tag, Food, FeedbackQuestion
+from apscheduler.schedulers.background import BackgroundScheduler
+from flask import Flask
 from datetime import datetime
-from website.models import db, Tag, Food, FeedbackQuestion
+from website import db
+
 
 def create_tags():
     if Tag.query.count() == 0:  # Check if tags already exist

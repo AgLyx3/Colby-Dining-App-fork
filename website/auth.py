@@ -7,10 +7,11 @@ from flask_dance.contrib.google import make_google_blueprint, google
 from flask_login import LoginManager, login_user, logout_user, current_user
 from flask_dance.consumer import oauth_authorized
 from flask_dance.consumer.storage.session import SessionStorage
-from website.models import db, Administrator, Student
+from .models import Administrator, Student
 import os
 from functools import wraps
 from dotenv import load_dotenv
+from website import db
 
 load_dotenv()
 
