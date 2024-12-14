@@ -2,6 +2,7 @@ import pytest
 import os
 from website import create_app
 from website.models import db as _db
+from website.models import FeedbackQuestion, Response
 from flask import Flask
 
 class TestConfig(dict):
@@ -119,3 +120,5 @@ def admin_client(client):
         }
         session['is_admin'] = True
     return client
+
+
