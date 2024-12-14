@@ -15,28 +15,29 @@ db = SQLAlchemy()
 
 
 def create_app(test_config=None):
-   # Load environment variables
-   load_dotenv()
-   
-   from .scheduler import SchedulerService
-   y = SchedulerService()
-   # Initialize Flask app
-   app = Flask(__name__, static_folder='static')
-   with app.app_context():
-    y.init_app(app)
-   
-   # Configure logging
-   logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-   logger = logging.getLogger(__name__)
-   logger.info("Starting application initialization...")
 
-   from .views import main_blueprint
-   from .menu_routes import menu_bp
-   from .utils import create_tags
-   from .auth import auth_bp, google_bp, login_manager, init_admin_model
+    # Load environment variables
+    load_dotenv()
 
-   # Load configurations
-   if test_config is None:
+    from .scheduler import SchedulerService
+    y = SchedulerService()
+    # Initialize Flask app
+    app = Flask(__name__, static_folder='static')
+    with app.app_context():
+        y.init_app(app)
+
+    # Configure logging
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
+    logger.info("Starting application initialization...")
+
+    from .views import main_blueprint
+    from .menu_routes import menu_bp
+    from .utils import create_tags
+    from .auth import auth_bp, google_bp, login_manager, init_admin_model
+
+    # Load configurations
+    if test_config is None:
        app.config.from_mapping(
            SECRET_KEY=os.getenv('SECRET_KEY'),
            SQLALCHEMY_DATABASE_URI=os.getenv('SQLALCHEMY_DATABASE_URI'),
@@ -49,8 +50,8 @@ def create_app(test_config=None):
            MENU_API_PASSWORD=os.getenv('MENU_API_PASSWORD'),
            CACHE_DIR=os.getenv('CACHE_DIR', 'instance/cache')
        )
-       
-       # JawsDB Support 
+
+       # JawsDB Support
        # database_url = os.getenv('JAWSDB_URL')
        # if database_url:
        #     database_url = database_url.replace('mysql://', 'mysql+mysqlconnector://')
@@ -59,21 +60,21 @@ def create_app(test_config=None):
        # else:
        #    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
        #    logger.info("Using default database URL")
-       
+
     else:
         app.config.update(test_config)
 
-   # Initialize extensions
-   try:
+    # Initialize extensions
+    try:
        db.init_app(app)
        login_manager.init_app(app)
        init_admin_model()
        logger.info("Core services initialized successfully")
-   except Exception as e:
+    except Exception as e:
        logger.error(f"Initialization error: {e}")
        raise
-   
-   with app.app_context():
+
+    with app.app_context():
         try:
             db.create_all()  # Create the database tables
             create_tags()  # Assuming this function creates necessary initial data
@@ -91,8 +92,5 @@ def create_app(test_config=None):
         'MENU_API_USERNAME': os.getenv('MENU_API_USERNAME'),
         'MENU_API_PASSWORD': os.getenv('MENU_API_PASSWORD')
     })
-   
-
-
 
     return app
