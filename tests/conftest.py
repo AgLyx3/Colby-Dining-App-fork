@@ -8,7 +8,8 @@ Note:
 import pytest
 from website import create_app
 from website.models import db as _db
-
+from website.models import FeedbackQuestion, Response
+from flask import Flask
 
 class TestConfig(dict):
     """Test configuration."""
