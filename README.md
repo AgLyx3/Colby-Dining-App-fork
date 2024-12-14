@@ -11,7 +11,7 @@ The Colby Dining App is a comprehensive dining management system designed for Co
 ## Features
 - 📱 Real-time wait time predictions for dining halls
 - 🍳 Daily menu updates with dietary information
-- ⭐ Personalized favorite dish trackin
+- ⭐ Personalized favorite dish tracking
 - 📊 User feedback system
 - 🔐 Google OAuth authentication
 - 📱 Mobile-responsive design
