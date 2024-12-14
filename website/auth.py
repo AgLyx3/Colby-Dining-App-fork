@@ -2,16 +2,16 @@
 Filename:
     auth.py
 """
-from flask import Blueprint, redirect, url_for, flash, session
-from flask_dance.contrib.google import make_google_blueprint, google
-from flask_login import LoginManager, login_user, logout_user, current_user
-from flask_dance.consumer import oauth_authorized
-from flask_dance.consumer.storage.session import SessionStorage
-from .models import Administrator, Student
 import os
 from functools import wraps
 from dotenv import load_dotenv
+from flask import Blueprint, redirect, url_for, flash, session
+from flask_login import LoginManager, login_user, logout_user, current_user
+from flask_dance.contrib.google import make_google_blueprint, google
+from flask_dance.consumer import oauth_authorized
+from flask_dance.consumer.storage.session import SessionStorage
 from website import db
+from .models import Administrator, Student
 
 load_dotenv()
 
@@ -35,11 +35,11 @@ google_bp = make_google_blueprint(
         "https://www.googleapis.com/auth/userinfo.profile",
     ],
     storage=SessionStorage()
-    
 )
 
 @login_manager.user_loader
 def load_user(user_email):
+    """load user"""
     # Try loading as admin first
     admin = Administrator.query.get(user_email)
     if admin:
@@ -56,12 +56,14 @@ def init_admin_model():
 
 @auth_bp.route('/login')
 def google_login():
+    """google login"""
     if not google.authorized:
         return redirect(url_for('google.login'))
     return redirect(url_for('main.admin_dashboard'))
 
 @auth_bp.route('/logout')
 def logout():
+    """log out"""
     if google.authorized:
         token = google_bp.token
         if token:
@@ -71,7 +73,6 @@ def logout():
                 params={'token': token['access_token']},
                 headers={'Content-Type': 'application/x-www-form-urlencoded'}
             )
-            
     logout_user()
     session.clear()
     flash('You have been logged out successfully.', 'info')
@@ -79,6 +80,7 @@ def logout():
 
 @oauth_authorized.connect_via(google_bp)
 def google_logged_in(blueprint, token):
+    """ google log in"""
     if not token:
         flash('Failed to log in with Google.', 'error')
         return False
@@ -114,16 +116,15 @@ def google_logged_in(blueprint, token):
             )
             db.session.add(student)
             db.session.commit()
-        
         login_user(student)
         session['student_email'] = student.student_email
         session['is_admin'] = False
 
     session['google_name'] = user_info.get('name')
     session['google_picture'] = user_info.get('picture')
-    
     flash(f'Welcome, {user_info.get("given_name")}!', 'success')
     return False
+
 
 def admin_required(f):
     """Decorator for admin-only routes"""

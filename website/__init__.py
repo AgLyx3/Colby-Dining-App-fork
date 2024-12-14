@@ -15,7 +15,7 @@ db = SQLAlchemy()
 
 
 def create_app(test_config=None):
-
+    """create app"""
     # Load environment variables
     load_dotenv()
 
@@ -38,7 +38,7 @@ def create_app(test_config=None):
 
     # Load configurations
     if test_config is None:
-       app.config.from_mapping(
+        app.config.from_mapping(
            SECRET_KEY=os.getenv('SECRET_KEY'),
            SQLALCHEMY_DATABASE_URI=os.getenv('SQLALCHEMY_DATABASE_URI'),
            SQLALCHEMY_TRACK_MODIFICATIONS=False,
@@ -49,30 +49,30 @@ def create_app(test_config=None):
            MENU_API_USERNAME=os.getenv('MENU_API_USERNAME'),
            MENU_API_PASSWORD=os.getenv('MENU_API_PASSWORD'),
            CACHE_DIR=os.getenv('CACHE_DIR', 'instance/cache')
-       )
+        )
 
-       # JawsDB Support
-       # database_url = os.getenv('JAWSDB_URL')
-       # if database_url:
-       #     database_url = database_url.replace('mysql://', 'mysql+mysqlconnector://')
-       #     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-       #     logger.info("Using JawsDB URL for database connection")
-       # else:
-       #    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
-       #    logger.info("Using default database URL")
+        # JawsDB Support
+        # database_url = os.getenv('JAWSDB_URL')
+        # if database_url:
+        #     database_url = database_url.replace('mysql://', 'mysql+mysqlconnector://')
+        #     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+        #     logger.info("Using JawsDB URL for database connection")
+        # else:
+        #    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+        #    logger.info("Using default database URL")
 
     else:
         app.config.update(test_config)
 
     # Initialize extensions
     try:
-       db.init_app(app)
-       login_manager.init_app(app)
-       init_admin_model()
-       logger.info("Core services initialized successfully")
+        db.init_app(app)
+        login_manager.init_app(app)
+        init_admin_model()
+        logger.info("Core services initialized successfully")
     except Exception as e:
-       logger.error(f"Initialization error: {e}")
-       raise
+        logger.error(f"Initialization error: {e}")
+        raise
 
     with app.app_context():
         try:
