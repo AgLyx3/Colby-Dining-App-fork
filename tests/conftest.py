@@ -1,8 +1,13 @@
+"""
+Filename:
+    conftest.py
+
+Note:
+    Define fixtures and set up the testing database
+"""
 import pytest
-import os
 from website import create_app
 from website.models import db as _db
-from flask import Flask
 
 class TestConfig(dict):
     """Test configuration."""
