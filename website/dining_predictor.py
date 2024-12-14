@@ -166,7 +166,7 @@ class DiningHallPredictor:
                 scaled_data = scaler.fit_transform(features)
                 # Split data
                 train_size = int(len(scaled_data) * 0.8)
-                X_train = scaled_data[:train_size]
+                x_train = scaled_data[:train_size]
                 y_train = hall_data['count'].values[:train_size]
                 # Train model
                 model = RandomForestRegressor(
@@ -176,7 +176,7 @@ class DiningHallPredictor:
                     min_samples_leaf=2,
                     random_state=42
                 )
-                model.fit(X_train, y_train)
+                model.fit(x_train, y_train)
                 # Store model and scaler
                 self.models[hall] = model
                 self.scalers[hall] = scaler
