@@ -7,13 +7,9 @@ import logging
 from sqlite3 import IntegrityError
 from datetime import datetime, timedelta
 from sqlalchemy import cast, Date, and_, exists
-from flask import Blueprint, render_template, jsonify, request, redirect, url_for
-from flask import Blueprint, render_template, redirect, url_for
-from flask import request, current_app
-from .models import  Food, Tag, food_tags, Response
-from flask_login import login_required, current_user
+from flask import current_app
+from .models import Food, Tag, food_tags, Response
 from .utils import filter_foods, get_all_foods
-from flask import Blueprint, render_template, jsonify
 from flask import Blueprint, render_template, jsonify, request, redirect, session, url_for
 from flask_login import current_user, login_required
 from .auth import admin_required
@@ -36,29 +32,28 @@ email_sender = EmailSender()
 
 # Initialize predictor
 base_dir = os.path.dirname(os.path.abspath(__file__))
-predictor = None
-predictor_initialized = False
+PREDICTOR = None
+PREDICTOR_INITIALIZED = False
 
 
 def initialize_predictor():
     """Initialize the DiningHallPredictor with models"""
-    global predictor, predictor_initialized
+    global PREDICTOR, PREDICTOR_INITIALIZED
     try:
-        predictor = DiningHallPredictor(
+        PREDICTOR = DiningHallPredictor(
             model_dir=os.path.join(base_dir, 'ml_models'),
             data_dir=os.path.join(base_dir, 'data')
         )
-
-        if not any(predictor.models):
+        if not any(PREDICTOR.models):
             logger.info("No saved models found, training new models...")
-            df = predictor.load_data('October-*.csv')
-            predictor.train_models(df, save=True)
+            df = PREDICTOR.load_data('October-*.csv')
+            PREDICTOR.train_models(df, save=True)
 
-        predictor_initialized = True
+        PREDICTOR_INITIALIZED = True
         logger.info("Predictor initialized successfully")
         return True
     except Exception as e:
-        logger.error(f"Failed to initialize predictor: {str(e)}")
+        logger.error("Failed to initialize predictor: %s", str(e))
         return False
 
 
@@ -343,7 +338,7 @@ def export_responses(question_id):
 def get_wait_times():
     """Get wait time predictions for dining halls"""
     try:
-        if not predictor_initialized:
+        if not PREDICTOR_INITIALIZED:
             logger.error("Predictor not properly initialized")
             raise Exception("Prediction service unavailable")
 
@@ -352,7 +347,7 @@ def get_wait_times():
 
         for location in ['Dana', 'Roberts', 'Foss']:
             try:
-                prediction = predictor.predict_wait_times(current_time, location)
+                prediction = PREDICTOR.predict_wait_times(current_time, location)
                 if prediction:
                     predictions[location] = {
                         'status': 'closed' if prediction.get('status') == 'closed' else 'success',
