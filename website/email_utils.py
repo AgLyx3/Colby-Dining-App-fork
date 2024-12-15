@@ -390,7 +390,6 @@ class EmailUtils:
             </body>
         </html>
         """
-
     @staticmethod
     def create_reset_password_email(user_name, reset_link):
         """Create a reset password email with a custom message."""

@@ -188,7 +188,6 @@ def app():
     yield app
     with app.app_context():
         db.session.remove()
-
 @pytest.fixture
 def admin_user(app):
     """Create an admin user with a unique email."""

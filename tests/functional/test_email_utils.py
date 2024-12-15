@@ -172,7 +172,6 @@ def test_generate_special_offer_email():
     assert "<h1>Special Offer Just for You!</h1>" in email_body
     assert offer_details in email_body
 
-
 def test_validate_attachment_size():
     """Test the validation of attachment size."""
     valid_file = "small_file.txt"  # Ensure this file exists and is small enough
