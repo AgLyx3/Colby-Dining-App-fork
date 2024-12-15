@@ -120,7 +120,7 @@ def contact():
     return render_template('contact.html')
 
 
-# Dashboard routes
+
 @main_blueprint.route('/admin/dashboard')
 @login_required
 @admin_required
@@ -138,7 +138,6 @@ def userdashboard():
     return render_template('userdashboard.html')
 
 
-# Feedback question routes
 @main_blueprint.route('/admin/feedback-question', methods=['POST'])
 @login_required
 @admin_required
