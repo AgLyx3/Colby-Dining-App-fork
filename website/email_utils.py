@@ -468,12 +468,6 @@ class EmailUtils:
         return html_body
 
     @staticmethod
-    def validate_attachment_size(attachment_path, max_size_mb=5):
-        """Check if the attachment size exceeds the maximum allowed size."""
-        file_size = os.path.getsize(attachment_path) / (1024 * 1024)  # Convert bytes to MB
-        return file_size <= max_size_mb
-
-    @staticmethod
     def parse_email_body_from_html(html_content):
         """Extract and return the body content from an HTML email."""
         from bs4 import BeautifulSoup
