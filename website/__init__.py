@@ -52,14 +52,14 @@ def create_app(test_config=None):
         )
 
         # JawsDB Support
-        # database_url = os.getenv('JAWSDB_URL')
-        # if database_url:
-        #     database_url = database_url.replace('mysql://', 'mysql+mysqlconnector://')
-        #     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-        #     logger.info("Using JawsDB URL for database connection")
-        # else:
-        #    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
-        #    logger.info("Using default database URL")
+        database_url = os.getenv('JAWSDB_URL')
+        if database_url:
+            database_url = database_url.replace('mysql://', 'mysql+mysqlconnector://')
+            app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+            logger.info("Using JawsDB URL for database connection")
+        else:
+           app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+           logger.info("Using default database URL")
 
     else:
         app.config.update(vars(test_config))
