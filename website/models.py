@@ -115,7 +115,7 @@ class FeedbackQuestion(db.Model):
     default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
     administrator_id = db.Column(db.String(255),
-db.ForeignKey('administrator.admin_email'), nullable=False)
+    db.ForeignKey('administrator.admin_email'), nullable=False)
 
     # Relationship with Response (one-to-many)
     responses = db.relationship(
@@ -132,7 +132,7 @@ class Response(db.Model):
     content = db.Column(db.Text, nullable = False)
     question_id = db.Column(db.Integer, db.ForeignKey('feedback_question.id'), nullable=False)
     student_email = db.Column(db.String(255),
-db.ForeignKey('student.student_email'), nullable=False)
+    db.ForeignKey('student.student_email'), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 class WaitTime(db.Model):
@@ -154,4 +154,4 @@ class SurveyLink(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     admin_email = db.Column(db.String(255),
-db.ForeignKey('administrator.admin_email'), nullable=False)
+    db.ForeignKey('administrator.admin_email'), nullable=False)
