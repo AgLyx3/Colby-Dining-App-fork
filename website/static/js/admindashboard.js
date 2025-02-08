@@ -28,8 +28,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
     const tomorrow = today.toISOString().split('T')[0];
 
-    document.getElementById('activeStartDate').setAttribute('min', tomorrow);
-    document.getElementById('activeEndDate').setAttribute('min', tomorrow);
+    document.getElementById('activeStartDate').setAttribute('min', today);
+    document.getElementById('activeEndDate').setAttribute('min', today);
 });
 
 function initializeDashboard() {
