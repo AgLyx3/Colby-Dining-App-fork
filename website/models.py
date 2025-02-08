@@ -63,14 +63,14 @@ class Favorites(db.Model):
     created_at = db.Column(db.Date, nullable = False)
     update_at = db.Column(db.Date, nullable = False)
     student_email = db.Column(db.String(255),
-db.ForeignKey('student.student_email'), nullable = False)
+    db.ForeignKey('student.student_email'), nullable = False)
     food_id = db.Column(db.Integer, db.ForeignKey('food.id'), nullable = False)
 
 class FavoriteDish(db.Model):
     """Class name: FavoriteDish"""
     id = db.Column(db.Integer, primary_key=True)
     student_email = db.Column(db.String(255),
-db.ForeignKey('student.student_email'), nullable=False)
+    db.ForeignKey('student.student_email'), nullable=False)
     dish_name = db.Column(db.String(255), nullable=False)
     # We'll use dish name as unique identifier
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
