@@ -3,4 +3,5 @@ website/data/
 __pycache__/
 .env
 .coverage
-instance/
+#instance/
+.pytest_cache/
