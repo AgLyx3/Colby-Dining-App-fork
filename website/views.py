@@ -925,7 +925,8 @@ def submit_feedback_response():
         new_response = Response(
             content=content,
             question_id=question_id,
-            created_at=datetime.now()
+            created_at=datetime.now(),
+            student_email=current_user.student_email
         )
 
         logger.info("Going to add that response object into the db")
