@@ -76,6 +76,7 @@ def create_app(test_config=None):
 
     with app.app_context():
         try:
+            db.drop_all()
             db.create_all()  # Create the database tables
             create_tags()  # Assuming this function creates necessary initial data
             logger.info("Database initialized successfully")
