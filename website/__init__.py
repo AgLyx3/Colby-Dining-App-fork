@@ -2,6 +2,7 @@
 Filename:
     __init__.py
 """
+from datetime import datetime
 import os
 import logging
 import sys
@@ -9,6 +10,7 @@ from flask import Flask
 from flask_login import LoginManager
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash
 
 
 db = SQLAlchemy()
@@ -35,6 +37,7 @@ def create_app(test_config=None):
     from .menu_routes import menu_bp
     from .utils import create_tags
     from .auth import auth_bp, google_bp, login_manager, init_admin_model
+    from .models import Administrator
 
     # Load configurations
     if test_config is None:
@@ -80,6 +83,14 @@ def create_app(test_config=None):
             db.create_all()  # Create the database tables
             create_tags()  # Assuming this function creates necessary initial data
             logger.info("Database initialized successfully")
+            new_admin = Administrator(
+                admin_email='ztariq26@colby.edu',
+                password_hashed=generate_password_hash('1234'),
+                created_at=datetime.utcnow()
+            )
+            db.session.add(new_admin)
+            db.session.commit()
+            print(f"Successfully added administrator")
         except Exception as e:
             logger.error("Startup error: %s", str(e))
 
