@@ -802,18 +802,18 @@ def get_active_feedback_questions():
         logger.info(f"Checking for active questions for {current_user.student_email} on {current_date}")
 
         # Check if user has already answered a question today
-        today_response = Response.query.filter(
-            cast(Response.created_at, Date) == current_date,
-            Response.student_email == current_user.student_email
-        ).first()
+        # today_response = Response.query.filter(
+        #     cast(Response.created_at, Date) == current_date,
+        #     Response.student_email == current_user.student_email
+        # ).first()
 
-        if today_response:
-            logger.info(f"User has already answered a question today")
-            return jsonify({
-                'status': 'success',
-                'question': None,
-                'message': 'Daily question limit reached'
-            })
+        # if today_response:
+        #     logger.info(f"User has already answered a question today")
+        #     return jsonify({
+        #         'status': 'success',
+        #         'question': None,
+        #         'message': 'Daily question limit reached'
+        #     })
 
         # Get questions that:
         # 1. Are active
@@ -873,24 +873,24 @@ def submit_feedback_response():
             }), 400
 
         # Get current date for checking
-        current_date = datetime.now().date()
+        # current_date = datetime.now().date()
         # Check if user has already submitted today
-        existing_today = Response.query \
-            .filter(cast(Response.created_at, Date) == current_date) \
-            .first()
+        # existing_today = Response.query \
+        #     .filter(cast(Response.created_at, Date) == current_date) \
+        #     .first()
 
-        if existing_today:
-            return jsonify({
-                'status': 'error',
-                'message': 'Daily feedback limit reached'
-            }), 400
-        # Check if question exists and is active
-        question = FeedbackQuestion.query.get(question_id)
-        # if not question or not question.is_active:
+        # if existing_today:
         #     return jsonify({
         #         'status': 'error',
-        #         'message': 'Invalid or inactive question'
+        #         'message': 'Daily feedback limit reached'
         #     }), 400
+        # Check if question exists and is active
+        question = FeedbackQuestion.query.get(question_id)
+        if not question or not question.is_active:
+            return jsonify({
+                'status': 'error',
+                'message': 'Invalid or inactive question'
+            }), 400
         # if content.type == 'text':
         #     user_text = content.response
         #
@@ -927,5 +927,5 @@ def submit_feedback_response():
 
     except Exception as e:
         db.session.rollback()
-        logger.error("Error fetching menu: %s", str(e))
+        logger.error("Error submitting popup feedback: %s", str(e))
         return jsonify({'status': 'error', 'message': str(e)}), 500
