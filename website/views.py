@@ -865,8 +865,13 @@ def submit_feedback_response():
         question_id = data.get('question_id')
         content = data.get('response')
 
+        logger.info(f"{data = }")
+        logger.info(f"{question_id = }")
+        logger.info(f"{content = }")
+
         # Validate input
         if not all([question_id, content]):
+            logger.info("Missing required fields")
             return jsonify({
                 'status': 'error',
                 'message': 'Missing required fields'
@@ -885,8 +890,12 @@ def submit_feedback_response():
         #         'message': 'Daily feedback limit reached'
         #     }), 400
         # Check if question exists and is active
+        logger.info("Trying to get feedback ")
         question = FeedbackQuestion.query.get(question_id)
+        logger.info("Got feedback query")
+
         if not question or not question.is_active:
+            logger.info("Invalid question.")
             return jsonify({
                 'status': 'error',
                 'message': 'Invalid or inactive question'
@@ -912,12 +921,17 @@ def submit_feedback_response():
         #         question_id=question_id,
         #         created_at=datetime.now()
         #     )
+        logger.info("Trying to make a new Response object")
         new_response = Response(
             content=content,
             question_id=question_id,
             created_at=datetime.now()
         )
+
+        logger.info("Going to add that response object into the db")
         db.session.add(new_response)
+
+        logger.info("Committing everything.")
         db.session.commit()
 
         return jsonify({
