@@ -82,17 +82,18 @@ def create_app(test_config=None):
             db.create_all()  # Create the database tables
             create_tags()  # Assuming this function creates necessary initial data
             logger.info("Database initialized successfully")
-            new_admin = Administrator(
+            new_admin_1 = Administrator(
                 admin_email='ztariq26@colby.edu',
                 password_hashed=generate_password_hash('1234'),
                 created_at=datetime.utcnow()
             )
-            new_admin = Administrator(
+            new_admin_2 = Administrator(
                 admin_email='yli25@colby.edu',
                 password_hashed=generate_password_hash('1234'),
                 created_at=datetime.utcnow()
             )
-            db.session.add(new_admin)
+            db.session.add(new_admin_1)
+            db.session.add(new_admin_2)
             db.session.commit()
             print(f"Successfully added administrator")
         except Exception as e:
