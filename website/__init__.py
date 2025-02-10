@@ -79,12 +79,16 @@ def create_app(test_config=None):
 
     with app.app_context():
         try:
-            db.drop_all()
             db.create_all()  # Create the database tables
             create_tags()  # Assuming this function creates necessary initial data
             logger.info("Database initialized successfully")
             new_admin = Administrator(
                 admin_email='ztariq26@colby.edu',
+                password_hashed=generate_password_hash('1234'),
+                created_at=datetime.utcnow()
+            )
+            new_admin = Administrator(
+                admin_email='yli25@colby.edu',
                 password_hashed=generate_password_hash('1234'),
                 created_at=datetime.utcnow()
             )
