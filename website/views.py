@@ -869,6 +869,7 @@ def submit_feedback_response():
         logger.info(f"{question_id = }")
         logger.info(f"{content = }")
 
+        print("validating the input now")
         # Validate input
         if not all([question_id, content]):
             logger.info("Missing required fields")
@@ -891,7 +892,10 @@ def submit_feedback_response():
         #     }), 400
         # Check if question exists and is active
         logger.info("Trying to get feedback ")
+        print("Trying to get feedback ")
         question = FeedbackQuestion.query.get(question_id)
+        print("Got feedback query")
+
         logger.info("Got feedback query")
 
         if not question or not question.is_active:
@@ -930,7 +934,10 @@ def submit_feedback_response():
         )
 
         logger.info("Going to add that response object into the db")
+
+        print("Going to add that response object into the db")
         db.session.add(new_response)
+        print("Committing everything.")
 
         logger.info("Committing everything.")
         db.session.commit()
@@ -941,6 +948,6 @@ def submit_feedback_response():
         })
 
     except Exception as e:
-        db.session.rollback()
+        #db.session.rollback()
         logger.error("Error submitting popup feedback: %s", str(e))
         return jsonify({'status': 'error', 'message': str(e)}), 500
