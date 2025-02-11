@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    setInterval(initializeDashboard, 1000);
+    // setInterval(initializeDashboard, 1000);
 
     const today = new Date();
     today.setDate(today.getDate() + 1);  // Add one day to today's date
